@@ -36,7 +36,7 @@ const isMainClass = ['match', ['get', 'BANQUETA_D'], MAIN_CLASSES, true, false];
 export function buildStyle(pmtilesUrl) {
   return {
     version: 8,
-    name: 'Banquetas de México — Día de Muertos',
+    name: 'Sidewalks of Mexico — Día de Muertos',
     glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
     sky: {
       'sky-color': '#060312',

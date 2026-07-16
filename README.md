@@ -1,4 +1,4 @@
-# Banquetas de México 🇲🇽
+# Sidewalks of Mexico 🇲🇽
 
 A **Día de Muertos**-styled 3D web map visualizing sidewalk coverage across Mexico,
 built from INEGI 2020 census block-front data (8.3M segments, all 32 states).

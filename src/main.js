@@ -23,11 +23,14 @@ map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-
 
 // --- Fly-to presets ---
 const PLACES = [
-  { name: 'Centro', center: [-99.1332, 19.4326], zoom: 14.5, pitch: 60, bearing: -17 },
-  { name: 'Condesa', center: [-99.174, 19.4115], zoom: 14.8, pitch: 60, bearing: 20 },
-  { name: 'Coyoacán', center: [-99.1617, 19.3467], zoom: 14.8, pitch: 55, bearing: 0 },
-  { name: 'Iztapalapa', center: [-99.0553, 19.3574], zoom: 13.8, pitch: 55, bearing: -30 },
-  { name: '🇲🇽 México', center: [-102.5, 23.8], zoom: 4.3, pitch: 0, bearing: 0 },
+  { name: 'Mexico City', center: [-99.1332, 19.4326], zoom: 14.5, pitch: 60, bearing: -17 },
+  { name: 'Guadalajara', center: [-103.3496, 20.6767], zoom: 14.5, pitch: 60, bearing: 15 },
+  { name: 'Monterrey', center: [-100.3161, 25.6866], zoom: 14.5, pitch: 60, bearing: -25 },
+  { name: 'Puebla', center: [-98.2063, 19.0414], zoom: 14.5, pitch: 58, bearing: 0 },
+  { name: 'Tijuana', center: [-117.0382, 32.5149], zoom: 14.3, pitch: 58, bearing: 10 },
+  { name: 'Mérida', center: [-89.6237, 20.9674], zoom: 14.5, pitch: 55, bearing: 0 },
+  { name: 'Oaxaca', center: [-96.7266, 17.0732], zoom: 14.8, pitch: 55, bearing: -10 },
+  { name: '🇲🇽 All Mexico', center: [-102.5, 23.8], zoom: 4.3, pitch: 0, bearing: 0 },
 ];
 
 const nav = document.getElementById('places');
@@ -42,11 +45,11 @@ for (const p of PLACES) {
 
 // --- Hover info card ---
 const STATUS_LABEL = {
-  Dispone: { text: 'Con banqueta', color: '#FFA800' },
-  'No dispone': { text: 'Sin banqueta', color: '#FF2E92' },
-  'No aplica': { text: 'No aplica', color: '#5a4d80' },
-  'Conjunto habitacional': { text: 'Conjunto habitacional', color: '#5a4d80' },
-  'No especificado': { text: 'No especificado', color: '#5a4d80' },
+  Dispone: { text: 'Has sidewalk', color: '#FFA800' },
+  'No dispone': { text: 'No sidewalk', color: '#FF2E92' },
+  'No aplica': { text: 'Not applicable', color: '#5a4d80' },
+  'Conjunto habitacional': { text: 'Gated housing complex', color: '#5a4d80' },
+  'No especificado': { text: 'Unspecified', color: '#5a4d80' },
 };
 
 const info = document.getElementById('info');
@@ -71,7 +74,7 @@ map.on('mousemove', (e) => {
   const f = features[0].properties;
   const status = STATUS_LABEL[f.BANQUETA_D] ?? { text: f.BANQUETA_D ?? '—', color: '#5a4d80' };
   const street = [f.TIPOVIAL, f.NOMVIAL].filter((s) => s && s !== 'None').join(' ');
-  infoStreet.textContent = street || 'Vialidad sin nombre';
+  infoStreet.textContent = street || 'Unnamed street';
   infoStatus.textContent = status.text;
   infoStatus.style.color = status.color;
   infoLoc.textContent = f._state_name ?? '';
