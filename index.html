@@ -57,16 +57,24 @@
         <rect width="100%" height="46" fill="url(#pennants)"/>
       </svg>
       <h1>Sidewalks of Mexico</h1>
-      <p class="subtitle">Sidewalk coverage by city-block front · INEGI 2020 Census</p>
     </header>
 
     <!-- Legend -->
-    <aside id="legend" aria-label="Map legend">
+    <aside id="legend" aria-label="Sidewalk filters">
       <h2>Sidewalk</h2>
-      <div class="row"><span class="swatch" style="--c:#FFA800"></span> Has sidewalk</div>
-      <div class="row"><span class="swatch" style="--c:#FF2E92"></span> No sidewalk</div>
-      <div class="row"><span class="swatch dim" style="--c:#5a4d80"></span> Other / unspecified</div>
-      <p class="credit">Data: INEGI 2020 Census (urban environment)</p>
+      <label class="toggle row">
+        <input type="checkbox" id="filter-yes" checked />
+        <span class="swatch" style="--c:#FFA800"></span> Has sidewalk
+      </label>
+      <label class="toggle row">
+        <input type="checkbox" id="filter-no" checked />
+        <span class="swatch" style="--c:#FF2E92"></span> No sidewalk
+      </label>
+      <label class="toggle row">
+        <input type="checkbox" id="filter-other" checked />
+        <span class="swatch dim" style="--c:#5a4d80"></span> Other / unspecified
+      </label>
+      <p class="credit">Data: INEGI 2020 Census</p>
     </aside>
 
     <!-- Layer toggles -->

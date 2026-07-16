@@ -16,10 +16,11 @@ const map = new maplibregl.Map({
   pitch: 60,
   bearing: -17,
   hash: true,
-  attributionControl: { compact: true },
+  attributionControl: false,
 });
 
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
 
 // --- Fly-to presets ---
 const PLACES = [
@@ -76,6 +77,27 @@ if (prefersReducedMotion) {
   // ~3.5s per chip per loop reads as a calm ticker; count-based so it needs no layout measurement
   track.style.setProperty('--marquee-duration', `${PLACES.length * 3.5}s`);
 }
+
+// --- Sidewalk class filters (legend checkboxes) ---
+const filterYes = document.getElementById('filter-yes');
+const filterNo = document.getElementById('filter-no');
+const filterOther = document.getElementById('filter-other');
+
+function applySidewalkFilter() {
+  if (!map.getLayer('sidewalk-core')) return;
+  const enabled = [];
+  if (filterYes.checked) enabled.push('Dispone');
+  if (filterNo.checked) enabled.push('No dispone');
+  const filter = enabled.length
+    ? ['match', ['get', 'BANQUETA_D'], enabled, true, false]
+    : ['==', ['get', 'BANQUETA_D'], '__none__'];
+  map.setFilter('sidewalk-core', filter);
+  map.setFilter('sidewalk-glow', filter);
+  map.setLayoutProperty('sidewalk-other', 'visibility', filterOther.checked ? 'visible' : 'none');
+}
+
+for (const el of [filterYes, filterNo, filterOther]) el.addEventListener('change', applySidewalkFilter);
+map.on('load', applySidewalkFilter);
 
 const marqueeToggle = document.getElementById('marquee-toggle');
 marqueeToggle.addEventListener('click', () => {
