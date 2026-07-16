@@ -28,17 +28,32 @@ const PLACES = [
   { name: 'Monterrey', center: [-100.3161, 25.6866], zoom: 14.5, pitch: 60, bearing: -25 },
   { name: 'Puebla', center: [-98.2063, 19.0414], zoom: 14.5, pitch: 58, bearing: 0 },
   { name: 'Tijuana', center: [-117.0382, 32.5149], zoom: 14.3, pitch: 58, bearing: 10 },
+  { name: 'León', center: [-101.6821, 21.123], zoom: 14.5, pitch: 58, bearing: 0 },
+  { name: 'Ciudad Juárez', center: [-106.4245, 31.6904], zoom: 14.3, pitch: 55, bearing: 0 },
+  { name: 'Querétaro', center: [-100.3899, 20.5888], zoom: 14.5, pitch: 58, bearing: -15 },
   { name: 'Mérida', center: [-89.6237, 20.9674], zoom: 14.5, pitch: 55, bearing: 0 },
+  { name: 'Cancún', center: [-86.8515, 21.1619], zoom: 14.3, pitch: 55, bearing: 20 },
+  { name: 'Toluca', center: [-99.6532, 19.2879], zoom: 14.5, pitch: 58, bearing: 0 },
+  { name: 'Aguascalientes', center: [-102.2916, 21.8853], zoom: 14.5, pitch: 58, bearing: 0 },
+  { name: 'San Luis Potosí', center: [-100.9855, 22.1565], zoom: 14.5, pitch: 58, bearing: 0 },
+  { name: 'Hermosillo', center: [-110.9559, 29.0729], zoom: 14.3, pitch: 55, bearing: 0 },
+  { name: 'Culiacán', center: [-107.394, 24.8069], zoom: 14.5, pitch: 55, bearing: 0 },
+  { name: 'Veracruz', center: [-96.1342, 19.1738], zoom: 14.5, pitch: 55, bearing: 10 },
   { name: 'Oaxaca', center: [-96.7266, 17.0732], zoom: 14.8, pitch: 55, bearing: -10 },
   { name: '🇲🇽 All Mexico', center: [-102.5, 23.8], zoom: 4.3, pitch: 0, bearing: 0 },
 ];
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// --- City chip marquee ---
 const nav = document.getElementById('places');
-for (const p of PLACES) {
+const track = nav.querySelector('.marquee-track');
+const [mainSet, cloneSet] = nav.querySelectorAll('.marquee-set');
+
+function makeChip(p, isClone) {
   const btn = document.createElement('button');
   btn.textContent = p.name;
+  if (isClone) btn.tabIndex = -1; // clone set is aria-hidden; keep it out of tab order too
   btn.addEventListener('click', () => {
     map.flyTo({
       center: p.center,
@@ -48,8 +63,27 @@ for (const p of PLACES) {
       duration: prefersReducedMotion ? 0 : 2500,
     });
   });
-  nav.appendChild(btn);
+  return btn;
 }
+
+for (const p of PLACES) mainSet.appendChild(makeChip(p, false));
+for (const p of PLACES) cloneSet.appendChild(makeChip(p, true));
+
+if (prefersReducedMotion) {
+  nav.classList.add('reduced-motion'); // static, scrollable strip; clones hidden in CSS
+  document.getElementById('marquee-toggle').hidden = true;
+} else {
+  // ~3.5s per chip per loop reads as a calm ticker; count-based so it needs no layout measurement
+  track.style.setProperty('--marquee-duration', `${PLACES.length * 3.5}s`);
+}
+
+const marqueeToggle = document.getElementById('marquee-toggle');
+marqueeToggle.addEventListener('click', () => {
+  const paused = nav.classList.toggle('paused');
+  marqueeToggle.setAttribute('aria-pressed', String(paused));
+  marqueeToggle.setAttribute('aria-label', paused ? 'Play city ticker' : 'Pause city ticker');
+  marqueeToggle.textContent = paused ? '▶' : '⏸';
+});
 
 // --- Layer toggles ---
 const LAYER_TOGGLES = [

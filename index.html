@@ -15,6 +15,9 @@
   <body>
     <div id="map"></div>
 
+    <!-- Top scrim so header text stays readable over map labels -->
+    <div id="top-scrim" aria-hidden="true"></div>
+
     <!-- Papel picado banner -->
     <header id="banner">
       <svg id="picado" preserveAspectRatio="none" aria-hidden="true">
@@ -79,8 +82,16 @@
       </label>
     </aside>
 
-    <!-- Fly-to chips -->
-    <nav id="places" aria-label="Fly to a city"></nav>
+    <!-- Fly-to chips (animated marquee) -->
+    <nav id="places" aria-label="Fly to a city">
+      <button id="marquee-toggle" aria-pressed="false" aria-label="Pause city ticker">⏸</button>
+      <div class="marquee">
+        <div class="marquee-track">
+          <div class="marquee-set" data-set="main"></div>
+          <div class="marquee-set" data-set="clone" aria-hidden="true"></div>
+        </div>
+      </div>
+    </nav>
 
     <!-- Hover info card -->
     <div id="info" hidden>

@@ -148,28 +148,106 @@ body {
   cursor: pointer;
 }
 
-/* --- Fly-to chips --- */
+/* --- Top scrim: keeps header/chips readable over map labels --- */
+#top-scrim {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--bg) 0%,
+    rgba(13, 10, 26, 0.9) 45%,
+    rgba(13, 10, 26, 0.55) 72%,
+    transparent 100%
+  );
+}
+
+/* --- Fly-to chips (marquee) --- */
 #places {
   position: absolute;
-  top: 96px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 134px; /* clear margin below the subtitle */
+  left: 0;
+  right: 0;
   z-index: 10;
   display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+}
+
+.marquee {
+  flex: 1;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll var(--marquee-duration, 60s) linear infinite;
+}
+
+.marquee-set {
+  display: flex;
   gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
+  padding-right: 8px; /* keeps chip spacing consistent across the loop seam */
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* pause when user asks, hovers, or keyboard-focuses a chip */
+#places.paused .marquee-track,
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+/* reduced motion: static scrollable strip, no clones */
+#places.reduced-motion .marquee-track {
+  animation: none;
+}
+
+#places.reduced-motion .marquee {
+  overflow-x: auto;
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
+#places.reduced-motion .marquee-set[data-set='clone'] {
+  display: none;
+}
+
+#marquee-toggle {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
 }
 
 #places button {
-  background: var(--card);
+  background: rgba(16, 12, 32, 0.95);
   border: 1px solid var(--border);
   color: var(--text);
   font-size: 13px;
-  padding: 6px 14px;
+  padding: 7px 14px;
   border-radius: 999px;
   cursor: pointer;
-  backdrop-filter: blur(6px);
+  white-space: nowrap;
   transition:
     border-color 0.15s,
     box-shadow 0.15s;
