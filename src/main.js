@@ -33,14 +33,37 @@ const PLACES = [
   { name: '🇲🇽 All Mexico', center: [-102.5, 23.8], zoom: 4.3, pitch: 0, bearing: 0 },
 ];
 
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 const nav = document.getElementById('places');
 for (const p of PLACES) {
   const btn = document.createElement('button');
   btn.textContent = p.name;
   btn.addEventListener('click', () => {
-    map.flyTo({ center: p.center, zoom: p.zoom, pitch: p.pitch, bearing: p.bearing, duration: 2500 });
+    map.flyTo({
+      center: p.center,
+      zoom: p.zoom,
+      pitch: p.pitch,
+      bearing: p.bearing,
+      duration: prefersReducedMotion ? 0 : 2500,
+    });
   });
   nav.appendChild(btn);
+}
+
+// --- Layer toggles ---
+const LAYER_TOGGLES = [
+  { input: 'toggle-buildings', layer: 'building-3d' },
+  { input: 'toggle-satellite', layer: 'satellite' },
+];
+for (const { input, layer } of LAYER_TOGGLES) {
+  const checkbox = document.getElementById(input);
+  const apply = () => {
+    if (!map.getLayer(layer)) return;
+    map.setLayoutProperty(layer, 'visibility', checkbox.checked ? 'visible' : 'none');
+  };
+  checkbox.addEventListener('change', apply);
+  map.on('load', apply);
 }
 
 // --- Hover info card ---

@@ -8,15 +8,15 @@ POC camera starts over Mexico City; the data and architecture are already nation
 
 ## How it works
 
-- **MapLibre GL JS v5** renders everything in WebGL: dark custom basemap, 3D extruded
-  buildings, real terrain, globe projection when zoomed out.
+- **MapLibre GL JS v5** renders everything in WebGL: dark custom basemap, globe
+  projection when zoomed out, and a Layers panel with toggles for 3D extruded
+  buildings (on by default) and satellite imagery (Esri World Imagery).
 - **PMTiles** (`public/data/mexico_sidewalks.pmtiles`, 482MB, not in git) is read
   directly by the browser via HTTP range requests — no tile server.
 - Sidewalk block-fronts are colored by INEGI's `BANQUETA_D` attribute:
   marigold `#FFA800` = has sidewalk, rosa mexicano `#FF2E92` = missing,
   dim purple = other/unspecified.
 - Basemap tiles: [OpenFreeMap](https://openfreemap.org) (keyless).
-  Terrain: AWS Open Data terrarium tiles (keyless).
 
 ## Run
 

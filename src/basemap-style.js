@@ -1,5 +1,5 @@
 // Custom "Día de Muertos" dark basemap over OpenFreeMap vector tiles
-// (OpenMapTiles schema) + AWS open terrain + local sidewalks PMTiles.
+// (OpenMapTiles schema) + optional satellite + local sidewalks PMTiles.
 
 const COLORS = {
   ground: '#0d0a1a',
@@ -9,8 +9,8 @@ const COLORS = {
   roadMinor: '#241c3a',
   roadMajor: '#2e2450',
   roadCasing: '#151024',
-  building: '#1a1030',
-  buildingTop: '#241745',
+  building: '#453567',
+  buildingTop: '#8b6fd8',
   boundary: '#4a3a7a',
   label: '#f5e9d6',
   labelHalo: '#0d0a1a',
@@ -53,13 +53,14 @@ export function buildStyle(pmtilesUrl) {
         type: 'vector',
         url: 'https://tiles.openfreemap.org/planet',
       },
-      terrain: {
-        type: 'raster-dem',
-        tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
-        encoding: 'terrarium',
+      satellite: {
+        type: 'raster',
+        tiles: [
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        ],
         tileSize: 256,
-        maxzoom: 13,
-        attribution: 'Terrain: Mapzen/AWS Open Data',
+        maxzoom: 19,
+        attribution: 'Imagery: Esri, Maxar, Earthstar Geographics',
       },
       sidewalks: {
         type: 'vector',
@@ -67,7 +68,6 @@ export function buildStyle(pmtilesUrl) {
         attribution: 'Banquetas: INEGI Censo 2020',
       },
     },
-    terrain: { source: 'terrain', exaggeration: 1.4 },
     layers: [
       { id: 'background', type: 'background', paint: { 'background-color': COLORS.ground } },
       {
@@ -98,17 +98,6 @@ export function buildStyle(pmtilesUrl) {
         source: 'openfreemap',
         'source-layer': 'waterway',
         paint: { 'line-color': COLORS.water, 'line-width': 1.2 },
-      },
-      {
-        id: 'hillshade',
-        type: 'hillshade',
-        source: 'terrain',
-        paint: {
-          'hillshade-shadow-color': '#050310',
-          'hillshade-highlight-color': '#2a2050',
-          'hillshade-accent-color': '#1b1233',
-          'hillshade-exaggeration': 0.35,
-        },
       },
       // --- roads ---
       {
@@ -159,6 +148,17 @@ export function buildStyle(pmtilesUrl) {
           'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.8, 8, 1.5],
           'line-dasharray': [3, 2],
           'line-opacity': 0.8,
+        },
+      },
+      // --- satellite imagery (toggled from the UI; covers the dark ground) ---
+      {
+        id: 'satellite',
+        type: 'raster',
+        source: 'satellite',
+        layout: { visibility: 'none' },
+        paint: {
+          'raster-brightness-max': 0.85,
+          'raster-saturation': -0.25,
         },
       },
       // --- sidewalks (the data!) — under 3D buildings, over roads ---
