@@ -11,10 +11,10 @@ const pmtilesUrl = `${location.origin}/data/mexico_sidewalks.pmtiles`;
 const map = new maplibregl.Map({
   container: 'map',
   style: buildStyle(pmtilesUrl),
-  center: [-99.1332, 19.4326], // CDMX Centro Histórico
-  zoom: 14.5,
-  pitch: 60,
-  bearing: -17,
+  center: [-100.5, 20.5], // tilted All Mexico globe view
+  zoom: 4.2,
+  pitch: 45,
+  bearing: -8,
   hash: true,
   attributionControl: false,
 });
@@ -22,10 +22,29 @@ const map = new maplibregl.Map({
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
 map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
 
-// MapLibre opens the compact attribution on load; start collapsed (ⓘ only)
-const attribEl = document.querySelector('.maplibregl-ctrl-attrib');
-attribEl.classList.remove('maplibregl-compact-show');
-attribEl.removeAttribute('open');
+// MapLibre re-adds 'maplibregl-compact-show' during load (resize event triggers
+// _updateCompact). Force collapse until the user clicks ⓘ.
+{
+  const attribEl = document.querySelector('.maplibregl-ctrl-attrib');
+  const summary = attribEl?.querySelector('summary');
+  let userInteracted = false;
+  const forceCollapse = () => {
+    if (userInteracted) return;
+    attribEl.classList.remove('maplibregl-compact-show');
+    attribEl.setAttribute('open', '');
+  };
+  forceCollapse();
+  const observer = new MutationObserver(() => {
+    if (!userInteracted && attribEl.classList.contains('maplibregl-compact-show')) {
+      forceCollapse();
+    }
+  });
+  observer.observe(attribEl, { attributes: true, attributeFilter: ['class', 'open'] });
+  summary?.addEventListener('click', () => {
+    userInteracted = true;
+    setTimeout(() => observer.disconnect(), 100);
+  });
+}
 
 // --- Fly-to presets ---
 const PLACES = [
@@ -46,7 +65,7 @@ const PLACES = [
   { name: 'Culiacán', center: [-107.394, 24.8069], zoom: 14.5, pitch: 55, bearing: 0 },
   { name: 'Veracruz', center: [-96.1342, 19.1738], zoom: 14.5, pitch: 55, bearing: 10 },
   { name: 'Oaxaca', center: [-96.7266, 17.0732], zoom: 14.8, pitch: 55, bearing: -10 },
-  { name: '🇲🇽 All Mexico', center: [-102.5, 23.8], zoom: 4.3, pitch: 0, bearing: 0 },
+  { name: '🇲🇽 All Mexico', center: [-100.5, 20.5], zoom: 4.2, pitch: 45, bearing: -8 },
 ];
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
