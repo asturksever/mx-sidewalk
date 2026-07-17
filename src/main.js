@@ -22,6 +22,11 @@ const map = new maplibregl.Map({
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
 map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
 
+// MapLibre opens the compact attribution on load; start collapsed (ⓘ only)
+const attribEl = document.querySelector('.maplibregl-ctrl-attrib');
+attribEl.classList.remove('maplibregl-compact-show');
+attribEl.removeAttribute('open');
+
 // --- Fly-to presets ---
 const PLACES = [
   { name: 'Mexico City', center: [-99.1332, 19.4326], zoom: 14.5, pitch: 60, bearing: -17 },
