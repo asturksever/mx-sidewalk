@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tokyo 4D — Shibuya in real time</title>
+<style>
+  :root {
+    /* Tokyo palette — see DESIGN.md */
+    --ink: #0a0e17;
+    --paper: #f5f7fb;
+    --sumi: #171b24;          /* charcoal ink */
+    --asagi: #4a86a8;         /* traditional pale indigo */
+    --sakura: #ff6b8a;        /* neon sakura — the accent */
+    --neon: #57e0e6;          /* Shibuya cyan */
+    --concrete: #9aa1a8;
+    --panel: rgba(9, 12, 19, 0.9);
+    --hairline: rgba(255, 255, 255, 0.13);
+    --muted: rgba(245, 247, 251, 0.62);
+    /* line / mode colours (official-ish) */
+    --yamanote: #9acd32;      /* JR 山手線 うぐいす */
+    --toyoko: #e6004c;        /* 東急東横線 */
+    --inokashira: #1d7fc4;    /* 京王井の頭線 */
+    --chuo: #f15a22;          /* 中央線 */
+    --rail: #c8d0d8;          /* default JR silver */
+    --bike: #e60012;          /* docomo bike-share red */
+    --cars: #9aa1a8;
+    --people: #e7e2d6;
+  }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--ink); }
+  #app { position: fixed; inset: 0; }
+  canvas { display: block; }
+
+  body { font-family: "Helvetica Neue", Helvetica, -apple-system, "Hiragino Sans", "Segoe UI", Arial, sans-serif; }
+
+  .panel {
+    position: fixed; z-index: 10; color: var(--paper);
+    background: var(--panel); border: 1px solid var(--hairline);
+    border-radius: 4px; font-size: 11.5px; line-height: 1;
+    backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
+  }
+
+  .brand { top: 16px; left: 18px; padding: 12px 16px; user-select: none; pointer-events: none; }
+  .brand h1 { margin: 0; font-size: 17px; letter-spacing: .26em; font-weight: 700; color: var(--paper); }
+  .brand h1 span { color: var(--sakura); font-weight: 300; }
+  .brand .sub { color: var(--muted); font-size: 10.5px; letter-spacing: .08em; margin-top: 6px; }
+  .brand .sub b { color: var(--neon); font-weight: 400; }
+
+  .time { top: 16px; right: 18px; padding: 10px 14px; text-align: right; }
+  .time .clk { font-size: 16px; font-weight: 300; letter-spacing: .1em; font-variant-numeric: tabular-nums; }
+  .time .wx { color: var(--muted); margin-top: 6px; font-size: 10.5px; letter-spacing: .04em; }
+  .time .audio { color: var(--neon); margin-top: 7px; font-size: 10px; letter-spacing: .1em;
+    text-transform: uppercase; cursor: pointer; pointer-events: auto; }
+  .time .audio.off { color: rgba(245,247,251,.4); }
+  .time .audio:hover { color: var(--paper); }
+
+  .legend { top: 82px; right: 18px; padding: 4px 0; min-width: 138px; }
+  .legend .row {
+    display: flex; align-items: center; gap: 8px; padding: 7px 13px;
+    font-variant-numeric: tabular-nums; cursor: pointer;
+  }
+  .legend .row[data-kind]:hover { background: rgba(255,255,255,.06); }
+  .legend .row + .row { border-top: 1px solid rgba(255,255,255,.05); }
+  .legend .row.off { opacity: .35; }
+  .legend .row.off .swatch { background: transparent !important; box-shadow: inset 0 0 0 1.5px currentColor; }
+  .legend .swatch { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .legend .name { color: var(--muted); letter-spacing: .04em; flex: 1; padding-right: 10px; }
+  .legend .n { font-weight: 600; min-width: 22px; text-align: right; }
+  .legend .dot { width: 5px; height: 5px; border-radius: 50%; background: #5a646d; flex: none; }
+  .legend .dot.on { background: #35d6b0; }
+  .legend .dot.err { background: #ff5f56; }
+  .legend .dot.sim { background: transparent; box-shadow: inset 0 0 0 1.4px rgba(245,247,251,.4); }
+  .legend .hint { color: rgba(245,247,251,.35); font-size: 9.5px; padding: 6px 13px 7px; letter-spacing: .03em; cursor: default; max-width: 168px; line-height: 1.35; }
+  .legend .group + .group .ghdr { border-top: 1px solid var(--hairline); }
+  .legend .ghdr {
+    display: flex; align-items: center; gap: 8px;
+    color: rgba(245,247,251,.55); font-size: 9.5px; letter-spacing: .2em;
+    text-transform: uppercase; padding: 9px 13px 7px; cursor: pointer;
+    user-select: none;
+  }
+  .legend .ghdr:hover { color: var(--paper); }
+  .legend .ghdr span { flex: 1; }
+  .legend .ghdr .sum { color: rgba(245,247,251,.35); font-size: 10px; letter-spacing: .04em;
+    font-variant-numeric: tabular-nums; opacity: 0; transition: opacity .2s; }
+  .legend .group.collapsed .ghdr .sum { opacity: 1; }
+  .legend .caret { width: 8px; height: 8px; display: inline-block;
+    border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg); transition: transform .18s; margin-top: -3px; }
+  .legend .group.collapsed .caret { transform: rotate(-45deg); margin-top: 0; }
+  .legend .rows { overflow: hidden; transition: max-height .22s ease, opacity .18s;
+    max-height: 1000px; opacity: 1; }
+  .legend .group.collapsed .rows { max-height: 0; opacity: 0; }
+
+  #follow {
+    position: fixed; bottom: 34px; left: 50%; transform: translate(-50%, 8px); z-index: 10;
+    padding: 8px 14px; opacity: 0; transition: opacity .3s, transform .3s;
+    color: var(--paper); letter-spacing: .06em; pointer-events: none;
+  }
+  #follow.show { opacity: 1; transform: translate(-50%, 0); }
+
+  #loading {
+    position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 14px;
+    background: radial-gradient(120% 90% at 50% 25%, #131a29 0%, #0a0e17 70%);
+    color: var(--paper); font-size: 13px; letter-spacing: .08em;
+    transition: opacity .6s; }
+  #loading.hide { opacity: 0; pointer-events: none; }
+  #loading .big { font-size: 24px; letter-spacing: .34em; font-weight: 700; }
+  #loading .big span { color: var(--sakura); font-weight: 300; }
+  #loading .jp { color: var(--muted); font-size: 11px; letter-spacing: .12em; }
+  #loading .bar { width: 210px; height: 2px; background: rgba(255,255,255,.12); overflow: hidden; }
+  #loading .bar i { display: block; height: 100%; width: 30%; background: var(--sakura);
+    animation: slide 1.2s ease-in-out infinite; }
+  @keyframes slide { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
+
+  .attrib { position: fixed; bottom: 10px; left: 18px; z-index: 10; max-width: 62vw;
+    color: rgba(232,240,248,.5); font-size: 10px; letter-spacing: .02em;
+    text-shadow: 0 1px 2px rgba(0,0,0,.8); pointer-events: none; }
+  .attrib a { color: inherit; }
+  .help { position: fixed; bottom: 10px; right: 18px; z-index: 10;
+    color: rgba(232,240,248,.4); font-size: 10px; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<div class="panel brand">
+  <h1>TOKYO <span>4D</span></h1>
+  <div class="sub"><b>渋谷 SHIBUYA</b> &middot; the city in real time</div>
+</div>
+
+<div class="panel time">
+  <div class="clk" id="clock">--:--:--</div>
+  <div class="wx"><span id="wx">&hellip;</span></div>
+  <div class="audio off" id="audiochip">sound</div>
+</div>
+
+<div class="panel legend" id="legend">
+  <div class="group" data-group="live">
+    <div class="ghdr"><span>live</span><b class="sum" id="sum-live"></b><i class="caret"></i></div>
+    <div class="rows">
+      <div class="row" data-kind="bike"><i class="swatch" style="background:var(--bike); color:var(--bike)"></i><span class="name">city bikes</span><span class="n" id="n-bike">0</span><i id="dot-bike" class="dot"></i></div>
+      <div class="row"><i class="swatch" style="background:var(--concrete)"></i><span class="name">city mesh</span><span class="n"></span><i id="dot-tiles" class="dot"></i></div>
+      <div class="row"><i class="swatch" style="background:var(--asagi)"></i><span class="name">weather &middot; sun</span><span class="n"></span><i id="dot-wx" class="dot"></i></div>
+    </div>
+  </div>
+  <div class="group" data-group="move">
+    <div class="ghdr"><span>movement &middot; sim</span><b class="sum" id="sum-move"></b><i class="caret"></i></div>
+    <div class="rows">
+      <div class="row" data-kind="train"><i class="swatch" style="background:var(--yamanote); color:var(--yamanote)"></i><span class="name">trains &middot; sim</span><span class="n" id="n-train">0</span><i class="dot sim"></i></div>
+      <div class="row" data-kind="cars"><i class="swatch" style="background:var(--cars); color:var(--cars)"></i><span class="name">cars &middot; flow</span><span class="n" id="n-cars">0</span><i class="dot sim"></i></div>
+      <div class="row" data-kind="ped"><i class="swatch" style="background:var(--people); color:var(--people)"></i><span class="name">people &middot; sim</span><span class="n" id="n-ped">0</span><i class="dot sim"></i></div>
+    </div>
+  </div>
+  <div class="group collapsed" data-group="map">
+    <div class="ghdr"><span>map layers</span><b class="sum" id="sum-map"></b><i class="caret"></i></div>
+    <div class="rows">
+      <div class="row" data-kind="ortho"><i class="swatch" style="background:#6d7b57; color:#6d7b57"></i><span class="name">aerial ground</span><span class="n"></span><i class="dot on"></i></div>
+      <div class="row" data-kind="rails"><i class="swatch" style="background:var(--rail); color:var(--rail)"></i><span class="name">rail lines</span><span class="n"></span><i class="dot on"></i></div>
+      <div class="row off" data-kind="shinjuku"><i class="swatch" style="background:#b08bd0; color:#b08bd0"></i><span class="name">Shinjuku ward</span><span class="n"></span><i class="dot" style="visibility:hidden"></i></div>
+    </div>
+  </div>
+  <div class="hint">click a row to toggle &middot; live transit positions need an ODPT key; trains, cars &amp; people here are honest simulations</div>
+</div>
+
+<div class="panel" id="follow">following &middot; drag, scroll or click empty space to release</div>
+
+<div id="loading">
+  <div class="big">TOKYO <span>4D</span></div>
+  <div class="jp">渋谷をよみこみ中 &middot; streaming the city&hellip;</div>
+  <div class="bar"><i></i></div>
+</div>
+
+<div class="attrib">3D buildings &amp; aerial photo &copy; <a href="https://www.mlit.go.jp/plateau/">MLIT Project PLATEAU</a> (CC BY 4.0) &middot; elevation &copy; GSI 地理院タイル &middot; roads &amp; rails &copy; OpenStreetMap contributors &middot; bikes &copy; Docomo Bike Share / citybik.es &middot; weather &copy; Open-Meteo</div>
+<div class="help">drag&nbsp;rotate &middot; right-drag&nbsp;pan &middot; scroll&nbsp;zoom &middot; click&nbsp;a&nbsp;train&nbsp;to&nbsp;follow</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/examples/jsm/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+    "3d-tiles-renderer": "https://cdn.jsdelivr.net/npm/3d-tiles-renderer@0.3.46/src/index.js",
+    "3d-tiles-renderer/": "https://cdn.jsdelivr.net/npm/3d-tiles-renderer@0.3.46/src/",
+    "three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.8.3/src/index.js"
+  }
+}
+</script>
+<script type="module" src="./app.js?v=3"></script>
+</body>
+</html>
