@@ -8,15 +8,21 @@
       "port": 5173
     },
     {
+      "name": "ca-sidewalk",
+      "runtimeExecutable": "/bin/zsh",
+      "runtimeArgs": ["-c", "export PATH=\"$HOME/.local/node/bin:$PATH\" && cd /Users/asturksever/ca-sidewalk && npm run dev"],
+      "port": 5175
+    },
+    {
       "name": "lokma",
       "runtimeExecutable": "/bin/zsh",
       "runtimeArgs": ["-c", "export PATH=\"$HOME/.local/node/bin:$PATH\" && cd /Users/asturksever/istanbul-poi && npm run dev -- --port 3100"],
       "port": 3100
     },
     {
-      "name": "constellation",
+      "name": "geoscope",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4178", "--directory", "/Users/asturksever/city-constellation"],
+      "runtimeArgs": ["-m", "http.server", "4178", "--directory", "/Users/asturksever/geoscope"],
       "port": 4178
     },
     {
@@ -24,6 +30,61 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "4179", "--directory", "/Users/asturksever/mx-sidewalk/tokyo-4d"],
       "port": 4179
+    },
+    {
+      "name": "deira-poi",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4180", "--directory", "/Users/asturksever/uae-poi-map"],
+      "port": 4180
+    },
+    {
+      "name": "registry",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4181", "--directory", "/Users/asturksever/registry/web"],
+      "port": 4181
+    },
+    {
+      "name": "bumigram",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4182", "--directory", "/Users/asturksever/bumigram-2.0"],
+      "port": 4182
+    },
+    {
+      "name": "spain-live",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4183", "--directory", "/Users/asturksever/spain-live"],
+      "port": 4183
+    },
+    {
+      "name": "spain-live-proxy",
+      "runtimeExecutable": "/bin/zsh",
+      "runtimeArgs": ["-c", "export PATH=\"$HOME/.local/node/bin:$PATH\" && node /Users/asturksever/spain-live/proxy/dev-proxy.mjs"],
+      "port": 4184,
+      "autoPort": false
+    },
+    {
+      "name": "imagery-register",
+      "runtimeExecutable": "/bin/zsh",
+      "runtimeArgs": ["-c", "export PATH=\"$HOME/.local/node/bin:$PATH\" && node /Users/asturksever/imagery-register/scripts/serve.mjs 4319"],
+      "port": 4319
+    },
+    {
+      "name": "ground-imagery",
+      "runtimeExecutable": "/bin/zsh",
+      "runtimeArgs": ["-c", "export PATH=\"$HOME/.local/node/bin:$PATH\" && node /Users/asturksever/ground-imagery-register/scripts/serve.mjs 4331"],
+      "port": 4331
+    },
+    {
+      "name": "underwriting-api",
+      "runtimeExecutable": "/bin/zsh",
+      "runtimeArgs": ["-c", "cd /Users/asturksever/insurance/service && ./.venv/bin/python -m uvicorn app:app --host 127.0.0.1 --port 8077"],
+      "port": 8077
+    },
+    {
+      "name": "underwriting-web",
+      "runtimeExecutable": "/bin/zsh",
+      "runtimeArgs": ["-c", "export PATH=\"$HOME/.local/node/bin:$PATH\" && cd /Users/asturksever/insurance/web && npm run dev"],
+      "port": 3080
     }
   ]
 }

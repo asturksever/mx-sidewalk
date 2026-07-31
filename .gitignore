@@ -2,3 +2,6 @@ node_modules/
 dist/
 public/data/
 .DS_Store
+
+# Netlify Drop deploy zip (regenerate with `npm run build && cd dist && zip -0r ../mx-sidewalk-netlify.zip .`)
+*.zip
