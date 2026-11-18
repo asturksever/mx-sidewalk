@@ -14,24 +14,32 @@ const COLORS = {
   boundary: '#4a3a7a',
   label: '#f5e9d6',
   labelHalo: '#0d0a1a',
-  sidewalkYes: '#FFA800', // cempasúchil marigold — has sidewalk
-  sidewalkNo: '#FF2E92', // rosa mexicano — missing sidewalk
-  sidewalkOther: '#5a4d80', // no aplica / conjunto habitacional / no especificado
+  // Where each sidewalk comes from (the archive's `provenance`), plus INEGI's
+  // block sides that have none (the `gaps` layer).
+  inegi: '#FFA800', // cempasúchil marigold — INEGI 2020 census only
+  both: '#2EE6D6', // turquesa — INEGI and an OSM-drawn sidewalk agree
+  osm: '#B98CFF', // violeta — drawn in OSM, not in INEGI
+  tagged: '#F5E9D6', // papel — offset from OSM road tags (sidewalk=both/left/right)
+  gap: '#FF2E92', // rosa mexicano — INEGI: this block side has no sidewalk
 };
 
-const MAIN_CLASSES = ['Dispone', 'No dispone'];
+// Drawn ways and the stubs that join them share a colour; connectors are short.
+const SOLID = ['both', 'inegi_only', 'osm_only', 'connector'];
 
 const sidewalkColor = [
   'match',
-  ['get', 'BANQUETA_D'],
-  'Dispone',
-  COLORS.sidewalkYes,
-  'No dispone',
-  COLORS.sidewalkNo,
-  COLORS.sidewalkOther,
+  ['get', 'provenance'],
+  'both', COLORS.both,
+  'inegi_only', COLORS.inegi,
+  'synth_tagged', COLORS.tagged,
+  COLORS.osm, // osm_only, connector
 ];
 
-const isMainClass = ['match', ['get', 'BANQUETA_D'], MAIN_CLASSES, true, false];
+const isSolid = ['match', ['get', 'provenance'], SOLID, true, false];
+
+const coreWidth = ['interpolate', ['linear'], ['zoom'], 4, 0.8, 8, 1, 11, 1, 14, 1.8, 17, 3.2];
+const glowWidth = ['interpolate', ['linear'], ['zoom'], 11, 3, 14, 7, 17, 14];
+const glowBlur = ['interpolate', ['linear'], ['zoom'], 11, 3, 17, 8];
 
 export function buildStyle(pmtilesUrl) {
   return {
@@ -65,7 +73,7 @@ export function buildStyle(pmtilesUrl) {
       sidewalks: {
         type: 'vector',
         url: `pmtiles://${pmtilesUrl}`,
-        attribution: 'Banquetas: INEGI Censo 2020',
+        attribution: 'Banquetas: INEGI Inventario Nacional de Viviendas 2020; © OpenStreetMap contributors',
       },
     },
     layers: [
@@ -162,16 +170,27 @@ export function buildStyle(pmtilesUrl) {
         },
       },
       // --- sidewalks (the data!) — under 3D buildings, over roads ---
+      // Block sides with no sidewalk sit under the sidewalks, so a drawn way on a
+      // block INEGI saw without one still shows.
       {
-        id: 'sidewalk-other',
+        id: 'gap-glow',
         type: 'line',
         source: 'sidewalks',
-        'source-layer': 'sidewalks',
-        filter: ['!', isMainClass],
+        'source-layer': 'gaps',
+        minzoom: 11,
+        layout: { 'line-cap': 'round' },
+        paint: { 'line-color': COLORS.gap, 'line-width': glowWidth, 'line-blur': glowBlur, 'line-opacity': 0.3 },
+      },
+      {
+        id: 'gap-core',
+        type: 'line',
+        source: 'sidewalks',
+        'source-layer': 'gaps',
+        layout: { 'line-cap': 'round' },
         paint: {
-          'line-color': COLORS.sidewalkOther,
-          'line-opacity': 0.4,
-          'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0.4, 13, 1, 16, 1.8],
+          'line-color': COLORS.gap,
+          'line-width': coreWidth,
+          'line-opacity': ['interpolate', ['linear'], ['zoom'], 4, 0.75, 11, 0.9],
         },
       },
       {
@@ -180,35 +199,36 @@ export function buildStyle(pmtilesUrl) {
         source: 'sidewalks',
         'source-layer': 'sidewalks',
         minzoom: 11,
-        filter: isMainClass,
+        filter: isSolid,
         layout: { 'line-cap': 'round' },
-        paint: {
-          'line-color': sidewalkColor,
-          'line-width': ['interpolate', ['linear'], ['zoom'], 11, 3, 14, 7, 17, 14],
-          'line-blur': ['interpolate', ['linear'], ['zoom'], 11, 3, 17, 8],
-          'line-opacity': 0.35,
-        },
+        paint: { 'line-color': sidewalkColor, 'line-width': glowWidth, 'line-blur': glowBlur, 'line-opacity': 0.35 },
       },
       {
         id: 'sidewalk-core',
         type: 'line',
         source: 'sidewalks',
         'source-layer': 'sidewalks',
-        filter: isMainClass,
+        filter: isSolid,
         layout: { 'line-cap': 'round' },
         paint: {
           'line-color': sidewalkColor,
-          'line-width': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            4, 0.8,
-            8, 1,
-            11, 1,
-            14, 1.8,
-            17, 3.2,
-          ],
+          'line-width': coreWidth,
           'line-opacity': ['interpolate', ['linear'], ['zoom'], 4, 0.9, 11, 1],
+        },
+      },
+      // Inferred from road tags rather than drawn or surveyed: dashed, like the
+      // US and Canada maps.
+      {
+        id: 'sidewalk-tagged',
+        type: 'line',
+        source: 'sidewalks',
+        'source-layer': 'sidewalks',
+        filter: ['==', ['get', 'provenance'], 'synth_tagged'],
+        paint: {
+          'line-color': COLORS.tagged,
+          'line-width': coreWidth,
+          'line-dasharray': [2, 1.5],
+          'line-opacity': ['interpolate', ['linear'], ['zoom'], 4, 0.7, 11, 0.9],
         },
       },
       // --- 3D buildings ---

@@ -1,0 +1,20 @@
+{
+  // Sidewalks of Mexico at https://www.opensidewalks.org/mx/. Build first:
+  //   BASE=/mx/ VITE_PMTILES_URL=/mx/data/mexico_sidewalks-<n>.pmtiles npm run build
+  // The us-sidewalks Worker owns www.opensidewalks.org (and the bare domain) as Custom Domains. Routes take
+  // precedence over a Custom Domain on the same hostname, so these send /mx here. A pattern without the * would
+  // miss /mx?x=1; with it, /mxyz comes here too, and worker.js passes it on to the US site.
+  "name": "mx-sidewalks",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-01",
+  "routes": [
+    { "pattern": "www.opensidewalks.org/mx*", "zone_name": "opensidewalks.org" },
+    { "pattern": "opensidewalks.org/mx*", "zone_name": "opensidewalks.org" }
+  ],
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": { "directory": "./dist", "binding": "ASSETS", "run_worker_first": true },
+  "observability": { "enabled": true },
+  // Read-only: the national archive.
+  "r2_buckets": [{ "binding": "BUCKET", "bucket_name": "ca-sidewalk-tiles", "remote": true }]
+}

@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="/src/style.css" />
+    <link rel="stylesheet" href="./src/style.css" />
   </head>
   <body>
     <div id="map"></div>
@@ -61,20 +61,28 @@
 
     <!-- Legend -->
     <aside id="legend" aria-label="Sidewalk filters">
-      <h2>Sidewalk</h2>
+      <h2>Sidewalks</h2>
       <label class="toggle row">
-        <input type="checkbox" id="filter-yes" checked />
-        <span class="swatch" style="--c:#FFA800"></span> Has sidewalk
+        <input type="checkbox" id="filter-both" checked />
+        <span class="swatch" style="--c:#2EE6D6"></span> INEGI and OpenStreetMap
       </label>
       <label class="toggle row">
-        <input type="checkbox" id="filter-no" checked />
-        <span class="swatch" style="--c:#FF2E92"></span> No sidewalk
+        <input type="checkbox" id="filter-inegi" checked />
+        <span class="swatch" style="--c:#FFA800"></span> INEGI census only
       </label>
       <label class="toggle row">
-        <input type="checkbox" id="filter-other" checked />
-        <span class="swatch dim" style="--c:#5a4d80"></span> Other / unspecified
+        <input type="checkbox" id="filter-osm" checked />
+        <span class="swatch" style="--c:#B98CFF"></span> Drawn in OpenStreetMap
       </label>
-      <p class="credit">Data: INEGI 2020 Census</p>
+      <label class="toggle row">
+        <input type="checkbox" id="filter-tagged" checked />
+        <span class="swatch dashed" style="--c:#F5E9D6"></span> From OSM road tags
+      </label>
+      <label class="toggle row">
+        <input type="checkbox" id="filter-gaps" checked />
+        <span class="swatch" style="--c:#FF2E92"></span> No sidewalk (INEGI)
+      </label>
+      <p class="credit">Data: INEGI Inventario Nacional de Viviendas 2020 · © OpenStreetMap contributors</p>
     </aside>
 
     <!-- Layer toggles -->
@@ -108,6 +116,6 @@
       <div id="info-loc"></div>
     </div>
 
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="./src/main.js"></script>
   </body>
 </html>
