@@ -3,119 +3,438 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sidewalks of Mexico — sidewalk coverage map</title>
+    <title>Sidewalks of Mexico</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%231a1233'/%3E%3Cg stroke-width='2.4' stroke-linecap='round'%3E%3Cpath stroke='%232EE6D6' d='M6 7.5h12'/%3E%3Cpath stroke='%23FFA800' d='M6 12h12'/%3E%3Cpath stroke='%23FF2E92' d='M6 16.5h12'/%3E%3C/g%3E%3C/svg%3E" />
+    <meta name="description" content="The most complete map of Mexico's sidewalks, built from open data: INEGI's 2020 survey of every urban block side merged with OpenStreetMap, line by line, with the streets that have no sidewalk." />
+    <link rel="canonical" href="https://www.opensidewalks.org/mx/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sidewalks of Mexico" />
+    <meta property="og:title" content="Sidewalks of Mexico" />
+    <meta property="og:description" content="The most complete map of Mexico's sidewalks, built from open data: INEGI's 2020 block-side survey merged with OpenStreetMap, line by line." />
+    <meta property="og:url" content="https://www.opensidewalks.org/mx/" />
+    <meta name="twitter:card" content="summary" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="./src/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/theme.css" />
+    <link rel="stylesheet" href="/src/landing.css" />
   </head>
   <body>
-    <div id="map"></div>
+    <!-- Papel picado, as across the top of the map -->
+    <svg id="picado" aria-hidden="true">
+      <defs>
+        <pattern id="pennants" x="0" y="0" width="300" height="40" patternUnits="userSpaceOnUse">
+          <g>
+            <path d="M0 0 H60 V26 Q52 26 50 34 Q45 22 37.5 30 Q30 20 22.5 30 Q15 22 10 34 Q8 26 0 26 Z" fill="#FF2E92" />
+            <circle cx="30" cy="12" r="4.5" fill="#0d0a1a" />
+            <path d="M20 19 l4.5 -4.5 4.5 4.5 -4.5 4.5 Z" fill="#0d0a1a" />
+            <path d="M31 19 l4.5 -4.5 4.5 4.5 -4.5 4.5 Z" fill="#0d0a1a" />
+          </g>
+          <g transform="translate(60,0)">
+            <path d="M0 0 H60 V26 Q52 26 50 34 Q45 22 37.5 30 Q30 20 22.5 30 Q15 22 10 34 Q8 26 0 26 Z" fill="#FFA800" />
+            <path d="M30 5 l6 7 -6 7 -6 -7 Z" fill="#0d0a1a" />
+            <circle cx="15" cy="15" r="3" fill="#0d0a1a" />
+            <circle cx="45" cy="15" r="3" fill="#0d0a1a" />
+          </g>
+          <g transform="translate(120,0)">
+            <path d="M0 0 H60 V26 Q52 26 50 34 Q45 22 37.5 30 Q30 20 22.5 30 Q15 22 10 34 Q8 26 0 26 Z" fill="#2EE6D6" />
+            <circle cx="30" cy="13" r="6" fill="#0d0a1a" />
+            <circle cx="30" cy="13" r="2.5" fill="#2EE6D6" />
+          </g>
+          <g transform="translate(180,0)">
+            <path d="M0 0 H60 V26 Q52 26 50 34 Q45 22 37.5 30 Q30 20 22.5 30 Q15 22 10 34 Q8 26 0 26 Z" fill="#9B5DE5" />
+            <path d="M18 18 l6 -10 6 10 Z" fill="#0d0a1a" />
+            <path d="M30 18 l6 -10 6 10 Z" fill="#0d0a1a" />
+          </g>
+          <g transform="translate(240,0)">
+            <path d="M0 0 H60 V26 Q52 26 50 34 Q45 22 37.5 30 Q30 20 22.5 30 Q15 22 10 34 Q8 26 0 26 Z" fill="#F15BB5" />
+            <circle cx="20" cy="10" r="3.5" fill="#0d0a1a" />
+            <circle cx="40" cy="10" r="3.5" fill="#0d0a1a" />
+            <path d="M22 19 q8 7 16 0" stroke="#0d0a1a" stroke-width="3" fill="none" />
+          </g>
+        </pattern>
+      </defs>
+      <rect width="100%" height="40" fill="url(#pennants)" />
+    </svg>
 
-    <!-- Top scrim so header text stays readable over map labels -->
-    <div id="top-scrim" aria-hidden="true"></div>
-
-    <!-- Papel picado banner -->
-    <header id="banner">
-      <svg id="picado" preserveAspectRatio="none" aria-hidden="true">
-        <defs>
-          <pattern id="pennants" x="0" y="0" width="300" height="46" patternUnits="userSpaceOnUse">
-            <!-- five pennants per repeat, scalloped bottoms, cut-out motifs -->
-            <g>
-              <path d="M0 0 H60 V30 Q52 30 50 38 Q45 26 37.5 34 Q30 24 22.5 34 Q15 26 10 38 Q8 30 0 30 Z" fill="#FF2E92"/>
-              <circle cx="30" cy="14" r="5" fill="#0d0a1a"/>
-              <path d="M20 22 l5 -5 5 5 -5 5 Z" fill="#0d0a1a"/>
-              <path d="M30 22 l5 -5 5 5 -5 5 Z" fill="#0d0a1a"/>
-            </g>
-            <g transform="translate(60,0)">
-              <path d="M0 0 H60 V30 Q52 30 50 38 Q45 26 37.5 34 Q30 24 22.5 34 Q15 26 10 38 Q8 30 0 30 Z" fill="#FFA800"/>
-              <path d="M30 6 l7 8 -7 8 -7 -8 Z" fill="#0d0a1a"/>
-              <circle cx="15" cy="18" r="3.5" fill="#0d0a1a"/>
-              <circle cx="45" cy="18" r="3.5" fill="#0d0a1a"/>
-            </g>
-            <g transform="translate(120,0)">
-              <path d="M0 0 H60 V30 Q52 30 50 38 Q45 26 37.5 34 Q30 24 22.5 34 Q15 26 10 38 Q8 30 0 30 Z" fill="#2EE6D6"/>
-              <circle cx="30" cy="15" r="7" fill="#0d0a1a"/>
-              <circle cx="30" cy="15" r="3" fill="#2EE6D6"/>
-            </g>
-            <g transform="translate(180,0)">
-              <path d="M0 0 H60 V30 Q52 30 50 38 Q45 26 37.5 34 Q30 24 22.5 34 Q15 26 10 38 Q8 30 0 30 Z" fill="#9B5DE5"/>
-              <path d="M18 20 l6 -10 6 10 Z" fill="#0d0a1a"/>
-              <path d="M30 20 l6 -10 6 10 Z" fill="#0d0a1a"/>
-            </g>
-            <g transform="translate(240,0)">
-              <path d="M0 0 H60 V30 Q52 30 50 38 Q45 26 37.5 34 Q30 24 22.5 34 Q15 26 10 38 Q8 30 0 30 Z" fill="#F15BB5"/>
-              <circle cx="20" cy="12" r="4" fill="#0d0a1a"/>
-              <circle cx="40" cy="12" r="4" fill="#0d0a1a"/>
-              <path d="M22 22 q8 8 16 0" stroke="#0d0a1a" stroke-width="3" fill="none"/>
-            </g>
-          </pattern>
-        </defs>
-        <rect width="100%" height="46" fill="url(#pennants)"/>
-      </svg>
-      <h1>Sidewalks of Mexico</h1>
+    <header id="nav">
+      <a class="brand" href="./" aria-label="Sidewalks of Mexico, home">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x=".5" y=".5" width="23" height="23" rx="5.5" fill="#1a1233" stroke="#3a2d5c" /><g stroke-width="2.4" stroke-linecap="round"><path stroke="#2EE6D6" d="M6 7.5h12" /><path stroke="#FFA800" d="M6 12h12" /><path stroke="#FF2E92" d="M6 16.5h12" /></g></svg>
+        Sidewalks <small>Mexico</small>
+      </a>
+      <nav aria-label="Sections">
+        <a href="#problem">The problem</a>
+        <a href="#gaps">No sidewalk</a>
+        <a href="#cities">Cities</a>
+        <a href="#method">Method</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a class="btn" href="map/">Explore the map</a>
     </header>
 
-    <!-- Legend -->
-    <aside id="legend" aria-label="Sidewalk filters">
-      <h2>Sidewalks</h2>
-      <label class="toggle row">
-        <input type="checkbox" id="filter-both" checked />
-        <span class="swatch" style="--c:#2EE6D6"></span> INEGI and OpenStreetMap
-      </label>
-      <label class="toggle row">
-        <input type="checkbox" id="filter-inegi" checked />
-        <span class="swatch" style="--c:#FFA800"></span> INEGI census only
-      </label>
-      <label class="toggle row">
-        <input type="checkbox" id="filter-osm" checked />
-        <span class="swatch" style="--c:#B98CFF"></span> Drawn in OpenStreetMap
-      </label>
-      <label class="toggle row">
-        <input type="checkbox" id="filter-tagged" checked />
-        <span class="swatch dashed" style="--c:#F5E9D6"></span> From OSM road tags
-      </label>
-      <label class="toggle row">
-        <input type="checkbox" id="filter-gaps" checked />
-        <span class="swatch" style="--c:#FF2E92"></span> No sidewalk (INEGI)
-      </label>
-      <p class="credit">Data: INEGI Inventario Nacional de Viviendas 2020 · © OpenStreetMap contributors</p>
-    </aside>
-
-    <!-- Layer toggles -->
-    <aside id="layers" aria-label="Map layers">
-      <h2>Layers</h2>
-      <label class="toggle">
-        <input type="checkbox" id="toggle-buildings" checked />
-        <span>3D buildings</span>
-      </label>
-      <label class="toggle">
-        <input type="checkbox" id="toggle-satellite" />
-        <span>Satellite imagery</span>
-      </label>
-    </aside>
-
-    <!-- Fly-to chips (animated marquee) -->
-    <nav id="places" aria-label="Fly to a city">
-      <button id="marquee-toggle" aria-pressed="false" aria-label="Pause city ticker">⏸</button>
-      <div class="marquee">
-        <div class="marquee-track">
-          <div class="marquee-set" data-set="main"></div>
-          <div class="marquee-set" data-set="clone" aria-hidden="true"></div>
+    <main>
+      <section id="hero">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <h1>The most complete map of Mexico’s sidewalks</h1>
+            <p class="lede">
+              Built from open data: INEGI’s 2020 survey of every side of every urban block, merged with
+              OpenStreetMap line by line. Together they hold <span data-stat="times">18</span> times the sidewalk
+              anyone has drawn in OpenStreetMap, and show the streets that have none.
+            </p>
+            <div class="hero-actions">
+              <a class="btn" href="map/">Explore the map</a>
+              <a class="btn ghost" href="#method">How it works</a>
+            </div>
+            <ul class="hero-cities" aria-label="Open the map at a city"></ul>
+          </div>
+          <div class="hero-frame">
+            <div id="hero-map" role="region" aria-label="Map of sidewalks in Mexico City’s historic centre"></div>
+            <a class="hero-place" id="hero-open" href="map/">Open the full map</a>
+            <ul class="hero-key" aria-label="Line colours">
+              <li><i style="--c: var(--both)"></i>INEGI and OSM</li>
+              <li><i style="--c: var(--inegi)"></i>INEGI only</li>
+              <li><i style="--c: var(--osm)"></i>OSM only</li>
+              <li><i class="dash" style="--c: var(--tagged)"></i>Road tags</li>
+              <li><i style="--c: var(--gap)"></i>No sidewalk</li>
+            </ul>
+          </div>
         </div>
+        <dl class="hero-stats">
+          <div>
+            <dt>Unified network</dt>
+            <dd><span data-stat="unified-km">—</span> km</dd>
+            <p>Every sidewalk once, whichever source had it</p>
+          </div>
+          <div>
+            <dt>Counted by INEGI</dt>
+            <dd><span data-stat="inegi-total-km">—</span> km</dd>
+            <p>Block sides the 2020 census found with a sidewalk</p>
+          </div>
+          <div>
+            <dt>Drawn in OpenStreetMap</dt>
+            <dd><span data-stat="osm-total-km">—</span> km</dd>
+            <p>Sidewalks mapped as their own lines across the country</p>
+          </div>
+        </dl>
+        <p class="hero-stats-note">
+          A sidewalk in both sources counts once in the network and once in each source. Figures are rounded, are
+          measured from the map’s current build and have not been validated yet.
+        </p>
+      </section>
+
+      <section id="problem" class="row">
+        <div class="row-copy">
+          <h2>Mexico counted its sidewalks. Almost nobody has drawn them.</h2>
+          <p>
+            For its 2020 housing inventory, INEGI recorded for every side of every urban block whether there is a
+            sidewalk: <span data-stat="all-sides">7.14 million</span> block sides in all 32 states.
+            OpenStreetMap, the open map behind many apps, has drawn a small fraction of that.
+          </p>
+          <ul class="points">
+            <li>
+              <strong>INEGI has the coverage.</strong> <span data-stat="with-sides">3.71 million</span> block sides
+              with a sidewalk, about <span data-stat="inegi-total-km">311,000</span> km.
+            </li>
+            <li>
+              <strong>OpenStreetMap has the geometry.</strong> Where someone has drawn a sidewalk it sits where the
+              sidewalk is. INEGI’s line follows the edge of the block.
+            </li>
+            <li>
+              <strong>They barely overlap.</strong> Only <span data-stat="drawn-pct">1</span>% of what INEGI
+              counted has also been drawn in OpenStreetMap.
+            </li>
+            <li>
+              <strong>Absent is recorded, not guessed.</strong> INEGI also says where there is no sidewalk, so
+              a gap on this map is a census finding, not a hole in the data.
+            </li>
+          </ul>
+          <p>So this map merges them: every sidewalk appears once and keeps a record of where it came from.</p>
+          <a class="more" href="map/">See where the sources agree</a>
+        </div>
+        <div class="figure">
+          <div class="stack" id="national-stack" role="img" aria-label="Share of each kind of line in the network">
+            <span style="--c: var(--both)"></span><span style="--c: var(--inegi)"></span><span style="--c: var(--osm)"></span><span style="--c: var(--tagged)"></span>
+          </div>
+          <dl>
+            <div style="--c: var(--unified)">
+              <dt><i></i>Unified network</dt>
+              <dd><span data-stat="unified-km">—</span> km</dd>
+              <p>Every sidewalk once, whichever source had it: the four kinds of line below, added up.</p>
+            </div>
+            <div style="--c: var(--both)">
+              <dt><i></i>INEGI and OpenStreetMap</dt>
+              <dd><span data-stat="both-km">—</span> km</dd>
+              <p>Confirmed twice: drawn in OpenStreetMap, with an INEGI block side alongside that has a sidewalk.</p>
+            </div>
+            <div style="--c: var(--inegi)">
+              <dt><i></i>INEGI census only</dt>
+              <dd><span data-stat="inegi-km">—</span> km</dd>
+              <p>INEGI says the block side has a sidewalk; nobody has drawn it yet.</p>
+            </div>
+            <div style="--c: var(--osm)">
+              <dt><i></i>Drawn in OpenStreetMap only</dt>
+              <dd><span data-stat="osm-km">—</span> km</dd>
+              <p>Paths, plazas and sidewalks outside the blocks INEGI surveyed.</p>
+            </div>
+            <div style="--c: var(--tagged)">
+              <dt><i class="dash"></i>From OpenStreetMap road tags</dt>
+              <dd><span data-stat="tagged-km">—</span> km</dd>
+              <p>A road tagged as having a sidewalk where neither source has a line; placed beside the road.</p>
+            </div>
+          </dl>
+          <p class="fine">Kilometres of sidewalk across Mexico, measured from the map’s current build.</p>
+        </div>
+      </section>
+
+      <section id="gaps" class="band">
+        <div class="wrap gap-grid">
+          <div>
+            <h2>Nearly half of Mexico’s urban block sides have no sidewalk</h2>
+            <p class="sub">
+              INEGI found <span data-stat="without-sides">3.43 million</span> block sides with no sidewalk:
+              <span data-stat="without-pct">48</span>% of those it could assess, about
+              <span data-stat="without-km">288,000</span> km of street edge. They are on the map in pink.
+            </p>
+            <p class="sub">
+              The share varies widely: from <span data-stat="min-pct">18</span>% of block sides in
+              <span data-stat="min-state">Aguascalientes</span> to <span data-stat="max-pct">82</span>% in
+              <span data-stat="max-state">Oaxaca</span>.
+            </p>
+            <a class="more" href="map/#14.8/17.0732/-96.7266/-10/55">See the gaps in Oaxaca</a>
+          </div>
+          <div class="states">
+            <h3>Block sides without a sidewalk, by state</h3>
+            <ol id="state-rows" class="state-rows"></ol>
+            <p class="fine">
+              Share of the block sides INEGI recorded as having a sidewalk or not. Sides it marked as housing
+              estates, not applicable or not specified are left out.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="cities" class="row stacked">
+        <div class="row-copy">
+          <h2>Start with a city you know</h2>
+          <p>
+            Pick a city to open the map there. Amber is INEGI alone; turquoise is where OpenStreetMap has drawn
+            what INEGI counted; pink is no sidewalk.
+          </p>
+        </div>
+        <ul class="city-doors" id="city-doors"></ul>
+      </section>
+
+      <section id="method" class="row stacked">
+        <div class="row-copy">
+          <h2>How three sources become one</h2>
+          <p>
+            The same method as <a href="../us/">Sidewalks of the United States</a> and
+            <a href="../ca/">Sidewalks of Canada</a>, with INEGI as the official source. Every line keeps a record
+            of where it came from.
+          </p>
+        </div>
+        <ol class="notes">
+          <li>
+            <h3>Collect</h3>
+            <p>
+              INEGI’s Inventario Nacional de Viviendas 2020 block fronts for all 32 states, and every pedestrian
+              way in OpenStreetMap’s Mexico extract: sidewalks, footways, paths, crossings and steps.
+            </p>
+          </li>
+          <li>
+            <h3>Read the road tags</h3>
+            <p>
+              Where a road carries <code>sidewalk=both</code>, <code>left</code> or <code>right</code> and nobody
+              has drawn the sidewalk, a line is placed beside the road at an estimated offset and shown dashed.
+            </p>
+          </li>
+          <li>
+            <h3>Cut and compare</h3>
+            <p>
+              Every line is cut into 25 m pieces. A piece matches when a line from the other source lies within
+              10 to 12 m along most of its length, heading the same way.
+            </p>
+          </li>
+          <li>
+            <h3>Keep each sidewalk once</h3>
+            <p>
+              A drawn OpenStreetMap sidewalk wins where both have it, because it sits where the sidewalk is. INEGI
+              fills the rest, and a road-tag line survives only where neither has one.
+            </p>
+          </li>
+        </ol>
+        <p class="caveat">
+          <strong>Read the amber with care.</strong> INEGI’s line runs along the block edge, not the sidewalk
+          itself, and records what an enumerator saw in 2020: it does not say how wide the sidewalk is, what state
+          it is in or whether it runs the whole length of the block.
+        </p>
+      </section>
+
+      <section id="for" class="row stacked">
+        <div class="row-copy">
+          <h2>Who it is for</h2>
+          <p>
+            One sidewalk layer for Mexico, with the source of every line on record. The data is not available for
+            download yet: <a href="#contact">tell me what you would need</a>.
+          </p>
+        </div>
+        <div class="who">
+          <a class="door" href="map/">
+            <h3>Companies that need pedestrian data</h3>
+            <p>Ride-hail, delivery and map makers: one layer to assess instead of two partial ones.</p>
+            <span class="more">Open the map</span>
+          </a>
+          <a class="door" href="#gaps">
+            <h3>Cities, planning and transit agencies</h3>
+            <p>Where the sidewalks are, and the block sides the census found without one.</p>
+            <span class="more">See the gaps</span>
+          </a>
+          <a class="door" href="map/">
+            <h3>Engineering and planning firms</h3>
+            <p>A starting layer for accessibility and road safety projects, with kerb ramps where INEGI recorded them.</p>
+            <span class="more">Open the map</span>
+          </a>
+          <a class="door" href="#method">
+            <h3>Researchers</h3>
+            <p>One comparable layer across the country, built the same way as the US and Canadian ones.</p>
+            <span class="more">Read the method</span>
+          </a>
+          <a class="door" href="map/">
+            <h3>OpenStreetMap mappers</h3>
+            <p>Where to map next. On the map, amber lines are sidewalks INEGI counted that nobody has drawn.</p>
+            <span class="more">See where the sources differ</span>
+          </a>
+        </div>
+      </section>
+
+      <section id="next" class="row">
+        <div class="row-copy">
+          <h2>What is next</h2>
+          <p>The merged layer is the first step. These come after it.</p>
+        </div>
+        <ul class="points">
+          <li><strong>Coverage by state and city.</strong> How much of each place’s network each source has.</li>
+          <li>
+            <strong>Downloads.</strong> Not available yet. Both sources are openly licensed: INEGI’s terms of free
+            use and the ODbL.
+          </li>
+        </ul>
+      </section>
+
+      <section id="contact" class="row">
+        <div class="row-copy">
+          <h2>Tell me what you see</h2>
+          <p>Open the map at a city you know well, then tell me:</p>
+          <ol class="asks">
+            <li>Is the coverage better than what you use today?</li>
+            <li>Where is it wrong?</li>
+            <li>What would you need in order to use it: format, attributes, licence, update frequency?</li>
+            <li>Is there work on your own data where this approach would help?</li>
+          </ol>
+          <h3>Who built this</h3>
+          <p>
+            Said Turksever. I spent seven years at Meta and Mapillary building map data at scale, including
+            pedestrian networks and now work as an independent geospatial product builder.
+          </p>
+          <a class="more" data-linkedin hidden href="#" target="_blank" rel="noopener">Find me on LinkedIn</a>
+        </div>
+        <div class="contact">
+          <form id="contact-form" novalidate>
+            <label>
+              <span>Message</span>
+              <textarea name="message" rows="6" maxlength="4000" required></textarea>
+            </label>
+            <div class="contact-pair">
+              <label>
+                <span>Name <small>optional</small></span>
+                <input name="name" type="text" maxlength="120" autocomplete="name" />
+              </label>
+              <label>
+                <span>Email <small>if you want a reply</small></span>
+                <input name="email" type="email" maxlength="200" autocomplete="email" spellcheck="false" />
+              </label>
+            </div>
+            <div class="contact-pair">
+              <label>
+                <span>Organisation <small>optional</small></span>
+                <input name="org" type="text" maxlength="160" autocomplete="organization" />
+              </label>
+              <label>
+                <span>I work in <small>optional</small></span>
+                <select name="role">
+                  <option value=""></option>
+                  <option>A company that uses map data</option>
+                  <option>A city or agency</option>
+                  <option>Engineering or planning</option>
+                  <option>Research</option>
+                  <option>OpenStreetMap mapping</option>
+                  <option>Something else</option>
+                </select>
+              </label>
+            </div>
+            <!-- Not for people: bots fill it in, and the Worker drops what they send. -->
+            <label class="contact-trap" aria-hidden="true">
+              <span>Website</span>
+              <input name="website" type="text" tabindex="-1" autocomplete="off" />
+            </label>
+            <div class="contact-send">
+              <button class="btn" type="submit">Send message</button>
+              <p id="contact-status" role="status"></p>
+            </div>
+            <p class="fine">Your message goes straight to me. Your email is used only to reply to you.</p>
+          </form>
+          <div id="contact-done" tabindex="-1" hidden>
+            <h3>Thank you, your message is sent</h3>
+            <p>I read every message. If you left an email address, I will reply to it.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="cta">
+        <h2>Start exploring the network</h2>
+        <p>Open the whole country, or jump to a city from the map.</p>
+        <div class="hero-actions">
+          <a class="btn" href="map/">Explore the map</a>
+          <a class="btn ghost" href="../us/">Sidewalks of the United States</a>
+        </div>
+      </section>
+    </main>
+
+    <footer id="foot">
+      <div class="foot-brand">
+        <a class="brand" href="./">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#1a1233" /><g stroke-width="2.4" stroke-linecap="round"><path stroke="#2EE6D6" d="M6 7.5h12" /><path stroke="#FFA800" d="M6 12h12" /><path stroke="#FF2E92" d="M6 16.5h12" /></g></svg>
+          Sidewalks <small>Mexico</small>
+        </a>
+        <p>The most complete map of Mexico’s sidewalks, built from open data.</p>
       </div>
-    </nav>
+      <nav aria-label="Map">
+        <h3>Map</h3>
+        <a href="map/">Sidewalks and gaps</a>
+        <a href="#cities">Cities</a>
+        <a href="#gaps">By state</a>
+      </nav>
+      <nav aria-label="About">
+        <h3>About</h3>
+        <a href="#problem">The problem</a>
+        <a href="#method">Method</a>
+        <a href="#for">Who it is for</a>
+        <a href="#contact">Send feedback</a>
+      </nav>
+      <nav aria-label="Related">
+        <h3>Related</h3>
+        <a href="../us/">Sidewalks of the United States</a>
+        <a href="../ca/">Sidewalks of Canada</a>
+        <a href="https://www.inegi.org.mx/programas/inv/2020/">INEGI Inventario Nacional de Viviendas 2020</a>
+        <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
+      </nav>
+      <p class="legal">
+        Contains information from INEGI, Inventario Nacional de Viviendas 2020, used under INEGI’s terms of free
+        use, and data © OpenStreetMap contributors (ODbL). Basemap © OpenFreeMap, OpenMapTiles.
+      </p>
+    </footer>
 
-    <!-- Hover info card -->
-    <div id="info" hidden>
-      <div id="info-street"></div>
-      <div id="info-status"></div>
-      <div id="info-loc"></div>
-    </div>
-
-    <script type="module" src="./src/main.js"></script>
+    <script type="module" src="/src/landing.js"></script>
   </body>
 </html>
