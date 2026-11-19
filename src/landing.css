@@ -1,0 +1,1046 @@
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 84px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+/* --- Nav: white bar, mark on the left, one pill on the right --- */
+#nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  height: 68px;
+  padding: 0 clamp(16px, 5vw, 72px);
+  background: var(--navy);
+  color: var(--text);
+  box-shadow: 0 1px 0 var(--rule);
+}
+
+#nav nav {
+  display: flex;
+  gap: clamp(16px, 2vw, 28px);
+  margin-right: auto;
+}
+
+#nav nav a {
+  white-space: nowrap;
+  font: 600 16px var(--body);
+  text-decoration: none;
+  color: var(--text-2);
+  transition: color 0.15s var(--ease);
+}
+
+#nav nav a:hover {
+  color: var(--text);
+}
+
+#nav .btn {
+  height: 40px;
+}
+
+#nav :focus-visible {
+  outline-color: var(--focus);
+}
+
+.row :focus-visible,
+.band :focus-visible,
+#foot :focus-visible {
+  outline-color: var(--accent);
+}
+
+/* --- Hero: navy, copy on the left, a live map in a frame on the right --- */
+#hero,
+#cta {
+  --surface: var(--navy);
+  --surface-2: var(--navy-2);
+  --line: var(--rule);
+  --fg: var(--text);
+  --fg-3: var(--muted);
+  --focus: #b98cff;
+  /* On the map's own ground the lines take the map's own colours. */
+  --both: #2ee6d6;
+  --inegi: #ffa800;
+  --osm: #b98cff;
+  --tagged: #f5e9d6;
+  --gap: #ff2e92;
+}
+
+#hero {
+  padding: clamp(40px, 7vw, 96px) clamp(16px, 5vw, 72px) clamp(40px, 5vw, 64px);
+  background: var(--navy);
+  color: var(--text);
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(28px, 5vw, 72px);
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+h1 {
+  margin: 0;
+  font: 700 clamp(48px, 6.4vw, 84px) / 1 var(--script);
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+}
+
+.lede {
+  max-width: 52ch;
+  margin: 22px 0 0;
+  font-size: clamp(18px, 1.6vw, 20px);
+  color: var(--text-2);
+}
+
+.hero-search {
+  max-width: 480px;
+  margin-top: 30px;
+}
+
+.hero-search input {
+  height: 52px;
+  font-size: 17px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.hero-frame {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--navy);
+  box-shadow: 0 0 0 1px var(--rule), 0 18px 44px rgba(0, 0, 0, 0.45);
+  text-decoration: none;
+  color: var(--text);
+}
+
+#hero-map {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.9s var(--ease);
+}
+
+#hero-map.ready {
+  opacity: 1;
+}
+
+.hero-place,
+.hero-key {
+  position: absolute;
+  left: 12px;
+  margin: 0;
+  padding: 7px 12px;
+  border-radius: 100px;
+  background: rgba(16, 12, 32, 0.88);
+  box-shadow: 0 0 0 1px rgba(155, 93, 229, 0.35);
+  font: 600 13px var(--body);
+}
+
+.hero-place {
+  top: 12px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.hero-place::after {
+  content: ' \2192';
+}
+
+.hero-place:hover {
+  background: var(--navy-3);
+}
+
+.hero-key {
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  list-style: none;
+  border-radius: 10px;
+  font-weight: 400;
+}
+
+.hero-key li,
+.cov-key li,
+.figure dt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-key i,
+.cov-key i,
+.figure i {
+  display: block;
+  flex: none;
+  width: 20px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--c);
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 3vw, 40px);
+  max-width: 1240px;
+  margin: clamp(40px, 6vw, 80px) auto 0;
+  padding-top: clamp(24px, 3vw, 36px);
+  border-top: 1px solid var(--line);
+}
+
+.hero-stats dt {
+  font: 600 13px / 1.3 var(--body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.hero-stats dd {
+  margin: 6px 0 0;
+  font: 700 clamp(26px, 3.4vw, 40px) / 1.1 var(--display);
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-stats p {
+  margin: 6px 0 0;
+  font-size: 15px;
+  color: var(--fg-3);
+}
+
+.hero-stats-note {
+  max-width: 1240px;
+  margin: 18px auto 0;
+  font-size: 13px;
+  color: var(--fg-3);
+}
+
+/* --- Rows on white, parted by hairlines --- */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(28px, 6vw, 88px);
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(56px, 8vw, 104px) clamp(16px, 5vw, 72px);
+}
+
+.row + .row,
+.band + .row {
+  border-top: 1px solid var(--hairline);
+}
+
+.row.stacked {
+  grid-template-columns: 1fr;
+  gap: 28px;
+}
+
+h2 {
+  margin: 0;
+  font: 700 clamp(28px, 3.2vw, 36px) / 1.2 var(--display);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+h3 {
+  margin: 0;
+  font: 700 20px/1.3 var(--display);
+}
+
+.row-copy p,
+.sub,
+.door p {
+  max-width: 56ch;
+  margin: 14px 0 0;
+  color: var(--ink-2);
+}
+
+.more {
+  display: inline-block;
+  margin-top: 18px;
+  font: 600 17px var(--body);
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.more::after {
+  content: '→';
+  display: inline-block;
+  margin-left: 8px;
+  transition: transform 0.15s var(--ease);
+}
+
+a.more:hover::after,
+.door:hover .more::after {
+  transform: translateX(4px);
+}
+
+/* The three figures, in the map's own line colours. */
+.figure {
+  padding: clamp(20px, 3vw, 32px);
+  border-radius: 12px;
+  background: var(--paper-2);
+}
+
+.stack {
+  display: flex;
+  gap: 3px;
+  height: 14px;
+}
+
+.stack span {
+  flex: 1 1 0;
+  min-width: 2px;
+  border-radius: 3px;
+  background: var(--c);
+}
+
+.figure dl {
+  margin: 8px 0 0;
+}
+
+.figure dl > div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.figure dt {
+  font-weight: 600;
+}
+
+.figure dd {
+  margin: 0;
+  font-weight: 700;
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  color: var(--c);
+}
+
+.figure dl p {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 15.5px;
+  color: var(--ink-2);
+}
+
+.fine {
+  margin: 14px 0 0;
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+/* --- States: a tinted band --- */
+.band {
+  padding: clamp(56px, 8vw, 104px) clamp(16px, 5vw, 72px);
+  background: var(--paper-2);
+}
+
+.wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.sort {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 26px;
+}
+
+.sort button,
+.cov-more {
+  height: 38px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 100px;
+  background: none;
+  box-shadow: inset 0 0 0 1px #d8cbcd;
+  color: var(--ink-2);
+  font: 600 15px var(--body);
+  cursor: pointer;
+  transition:
+    color 0.15s var(--ease),
+    background-color 0.15s var(--ease);
+}
+
+.sort button:hover,
+.cov-more:hover {
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.sort button[aria-pressed='true'] {
+  background: var(--accent);
+  box-shadow: none;
+  color: #fff;
+}
+
+.cov-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 24px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.cov-rows {
+  margin: 20px 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hairline);
+}
+
+.cov-rows a {
+  display: grid;
+  grid-template-columns: 180px 1fr 120px 120px;
+  align-items: center;
+  gap: 16px;
+  min-height: 46px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--hairline);
+  text-decoration: none;
+  transition: background-color 0.15s var(--ease);
+}
+
+.cov-rows a:hover {
+  background: var(--paper);
+}
+
+.cov-rows .stack {
+  height: 10px;
+}
+
+.st-name {
+  font-weight: 600;
+}
+
+.st-pct,
+.st-km {
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.st-pct small,
+.st-km small {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+/* --- Method --- */
+.notes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: note;
+}
+
+.notes li {
+  counter-increment: note;
+  padding: 24px;
+  border-radius: 12px;
+  background: var(--paper-2);
+}
+
+.notes li::before {
+  content: counter(note);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font: 700 15px var(--body);
+}
+
+.notes p {
+  margin: 8px 0 0;
+  font-size: 16px;
+  color: var(--ink-2);
+}
+
+.caveat {
+  margin: 0;
+  padding: 16px 20px;
+  border-radius: 12px;
+  border-left: 4px solid var(--accent);
+  background: var(--paper-2);
+  font-size: 16px;
+  color: var(--ink-2);
+}
+
+.caveat strong {
+  color: var(--ink);
+}
+
+/* --- Short points: a bold lead and a sentence --- */
+.points {
+  max-width: 60ch;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-2);
+}
+
+.points li {
+  padding: 12px 0 12px 16px;
+  border-left: 3px solid var(--hairline);
+}
+
+.points li + li {
+  margin-top: 10px;
+}
+
+.points strong {
+  color: var(--ink);
+}
+
+#next {
+  align-items: start;
+}
+
+#next .points {
+  margin-top: 0;
+}
+
+.row-copy a:not(.more) {
+  color: var(--accent);
+}
+
+/* Sorting sits under the states/cities switch, a step quieter. */
+.sort.by {
+  align-items: center;
+  margin-top: 18px;
+}
+
+.sort.by span {
+  margin-right: 4px;
+  font-size: 15px;
+}
+
+.sort.by button {
+  height: 32px;
+  padding: 0 14px;
+  font-size: 14px;
+}
+
+/* --- Who it is for: five ways in, three then two --- */
+.who {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.who .door {
+  grid-column: span 2;
+}
+
+.who .door:nth-child(n + 4) {
+  grid-column: span 3;
+}
+
+.who .door p {
+  font-size: 16.5px;
+}
+
+/* --- Two ways in --- */
+.row.pair {
+  align-items: stretch;
+  gap: 20px;
+}
+
+.door {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(22px, 3vw, 36px);
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--hairline);
+  text-decoration: none;
+  color: var(--ink);
+  transition: box-shadow 0.15s var(--ease);
+}
+
+.door:hover {
+  box-shadow:
+    inset 0 0 0 1px var(--accent),
+    0 12px 32px rgba(40, 10, 16, 0.1);
+}
+
+.door .more {
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+/* --- Contact: the questions and who is asking on the left, the form on the right --- */
+#contact {
+  align-items: start;
+  border-top: 1px solid var(--hairline);
+}
+
+.asks {
+  max-width: 56ch;
+  margin: 12px 0 0;
+  padding-left: 1.3em;
+  color: var(--ink-2);
+}
+
+.asks li + li {
+  margin-top: 6px;
+}
+
+#contact h3 {
+  margin-top: 36px;
+}
+
+/* The LinkedIn link waits on configuration (see site.js). */
+a[data-linkedin][hidden] {
+  display: none;
+}
+
+.contact {
+  padding: clamp(20px, 3vw, 32px);
+  border-radius: 12px;
+  background: var(--paper-2);
+}
+
+#contact-form,
+.contact-pair {
+  display: grid;
+  gap: 16px;
+}
+
+.contact-pair {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Sent: the thanks takes the form's place. */
+#contact-form[hidden] {
+  display: none;
+}
+
+.contact label {
+  display: grid;
+  gap: 6px;
+  font: 600 15.5px var(--body);
+  color: var(--ink);
+}
+
+.contact label small {
+  margin-left: 4px;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.contact input,
+.contact select,
+.contact textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #cdbfc2;
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 16px/1.45 var(--body);
+}
+
+.contact textarea {
+  resize: vertical;
+}
+
+.contact input:focus,
+.contact select:focus,
+.contact textarea:focus {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 25%, transparent);
+}
+
+.contact-trap {
+  position: absolute;
+  left: -9999px;
+}
+
+.contact-send {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.contact .btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+#contact-status {
+  margin: 0;
+  font-size: 15.5px;
+  color: var(--ink-2);
+}
+
+#contact-status.bad {
+  color: var(--accent);
+}
+
+.contact .fine {
+  margin: 0;
+}
+
+#contact-done h3 {
+  margin-top: 0;
+}
+
+#contact-done:focus {
+  outline: none;
+}
+
+#contact-done p {
+  margin: 8px 0 0;
+  color: var(--ink-2);
+}
+
+/* --- Closing call --- */
+#cta {
+  padding: clamp(56px, 8vw, 96px) clamp(16px, 5vw, 72px);
+  background: var(--navy);
+  color: var(--text);
+  text-align: center;
+}
+
+#cta p {
+  margin: 12px 0 0;
+  color: var(--text-2);
+}
+
+#cta .hero-actions {
+  justify-content: center;
+  margin-top: 26px;
+}
+
+/* --- Footer --- */
+#foot {
+  display: grid;
+  grid-template-columns: 2fr repeat(3, 1fr);
+  gap: 32px;
+  padding: 56px clamp(16px, 5vw, 72px) 40px;
+  background: var(--paper);
+  color: var(--ink-2);
+  font-size: 15.5px;
+}
+
+#foot .brand {
+  color: var(--ink);
+}
+
+.foot-brand p {
+  max-width: 34ch;
+  margin: 14px 0 0;
+}
+
+#foot h3 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: var(--ink);
+}
+
+#foot nav a {
+  display: block;
+  padding: 5px 0;
+  text-decoration: none;
+}
+
+#foot nav a:hover {
+  color: var(--accent);
+}
+
+.legal {
+  grid-column: 1 / -1;
+  max-width: 96ch;
+  margin: 8px 0 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--hairline);
+  font-size: 14px;
+}
+
+/* Six links, the mark and the pill need this much room on one line. */
+@media (max-width: 1060px) {
+  #nav nav {
+    display: none;
+  }
+  #nav .btn {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-grid,
+  .row,
+  .row.pair,
+  .notes,
+  .who {
+    grid-template-columns: 1fr;
+  }
+  .who .door,
+  .who .door:nth-child(n + 4) {
+    grid-column: auto;
+  }
+  .notes {
+    gap: 12px;
+  }
+  .hero-stats {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .cov-rows a {
+    grid-template-columns: 1fr auto auto;
+    gap: 4px 14px;
+    padding: 10px 4px;
+  }
+  .cov-rows .stack {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .st-km {
+    min-width: 92px;
+  }
+  #foot {
+    grid-template-columns: 1fr 1fr;
+  }
+  .foot-brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 520px) {
+  .contact-pair {
+    grid-template-columns: 1fr;
+  }
+  #nav {
+    gap: 12px;
+  }
+  #nav .brand small {
+    display: none;
+  }
+  #nav .btn {
+    padding: 0 18px;
+  }
+}
+
+/* --- Cities instead of a place search --- */
+.hero-cities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15.5px;
+}
+
+.hero-cities::before {
+  content: 'Jump to';
+  color: var(--muted);
+}
+
+.hero-cities a {
+  color: var(--text-2);
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 4px;
+}
+
+.hero-cities a:hover {
+  color: var(--text);
+  text-decoration-color: currentColor;
+}
+
+.city-doors {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.city-doors a {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 16px 18px;
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+  text-decoration: none;
+  transition: box-shadow 0.15s var(--ease);
+}
+
+.city-doors a:hover {
+  box-shadow:
+    inset 0 0 0 1px var(--accent),
+    0 8px 24px rgba(40, 10, 16, 0.08);
+}
+
+.city-doors strong {
+  font-size: 18px;
+}
+
+.city-doors strong::after {
+  content: ' \2192';
+  color: var(--accent);
+}
+
+.city-doors small {
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.notes code {
+  font-size: 0.92em;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--paper);
+}
+
+@media (max-width: 900px) {
+  .city-doors {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* --- Mexico --- */
+
+/* Papel picado across the top, as on the map. It scrolls away; the nav stays. */
+#picado {
+  display: block;
+  width: 100%;
+  height: 40px;
+  background: var(--navy);
+}
+
+/* The road-tag lines are drawn dashed on the map; their swatches are too. */
+.hero-key i.dash,
+.figure i.dash {
+  background: repeating-linear-gradient(90deg, var(--c) 0 5px, transparent 5px 8px);
+}
+
+.stack span:nth-child(4) {
+  background: repeating-linear-gradient(90deg, var(--c) 0 5px, transparent 5px 7px);
+}
+
+#cta h2 {
+  font: 700 clamp(40px, 5vw, 60px) / 1.05 var(--script);
+  letter-spacing: 0.01em;
+}
+
+/* --- No sidewalk: the case on the left, every state on the right --- */
+.gap-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-items: start;
+  gap: clamp(28px, 6vw, 88px);
+}
+
+.gap-grid .sub [data-stat] {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.states h3 {
+  font-size: 17px;
+}
+
+.state-rows {
+  columns: 2;
+  column-gap: 28px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.state-rows li {
+  display: grid;
+  grid-template-columns: minmax(0, 9.5em) 1fr 3em;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  break-inside: avoid;
+  font-size: 15px;
+}
+
+.state-rows .st-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 400;
+}
+
+.state-rows .bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--hairline);
+  overflow: hidden;
+}
+
+.state-rows .bar i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--gap);
+}
+
+.state-rows .st-pct {
+  font-size: 15px;
+}
+
+@media (max-width: 900px) {
+  .gap-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .state-rows {
+    columns: 1;
+  }
+}

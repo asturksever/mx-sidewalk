@@ -1,0 +1,179 @@
+{
+ "note": "Kilometres by provenance in mexico_sidewalks-4.pmtiles, from scripts/50_stats.py in the national build (GitHub run 44371977105, 2026-11-18), measured in EPSG:6372. Block sides per state from scripts/01_extract_inegi.py in the same run. Not validated yet.",
+ "archive": "mexico_sidewalks-4.pmtiles",
+ "km": {
+  "both": 3672.3,
+  "inegi_only": 307563.9,
+  "osm_only": 14018.6,
+  "synth_tagged": 2819.1,
+  "connector": 59.1
+ },
+ "inegi": {
+  "with_sidewalk": 3709905,
+  "with_km": 312764,
+  "without": 3432534,
+  "without_km": 288474
+ },
+ "states": {
+  "AGS": {
+   "name": "Aguascalientes",
+   "with": 51529,
+   "without": 11265
+  },
+  "BC": {
+   "name": "Baja California",
+   "with": 117662,
+   "without": 104848
+  },
+  "BCS": {
+   "name": "Baja California Sur",
+   "with": 28644,
+   "without": 40291
+  },
+  "CAMP": {
+   "name": "Campeche",
+   "with": 24441,
+   "without": 25836
+  },
+  "COAH": {
+   "name": "Coahuila",
+   "with": 162571,
+   "without": 89394
+  },
+  "COL": {
+   "name": "Colima",
+   "with": 46397,
+   "without": 14660
+  },
+  "CHIS": {
+   "name": "Chiapas",
+   "with": 86814,
+   "without": 143425
+  },
+  "CHIH": {
+   "name": "Chihuahua",
+   "with": 180217,
+   "without": 143476
+  },
+  "CDMX": {
+   "name": "Ciudad de México",
+   "with": 181924,
+   "without": 108889
+  },
+  "DGO": {
+   "name": "Durango",
+   "with": 70451,
+   "without": 60518
+  },
+  "GTO": {
+   "name": "Guanajuato",
+   "with": 162507,
+   "without": 121219
+  },
+  "GRO": {
+   "name": "Guerrero",
+   "with": 57186,
+   "without": 211145
+  },
+  "HGO": {
+   "name": "Hidalgo",
+   "with": 85974,
+   "without": 105671
+  },
+  "JAL": {
+   "name": "Jalisco",
+   "with": 282396,
+   "without": 149755
+  },
+  "MEX": {
+   "name": "Estado de México",
+   "with": 424352,
+   "without": 290637
+  },
+  "MICH": {
+   "name": "Michoacán",
+   "with": 143540,
+   "without": 166174
+  },
+  "MOR": {
+   "name": "Morelos",
+   "with": 54599,
+   "without": 94043
+  },
+  "NAY": {
+   "name": "Nayarit",
+   "with": 45385,
+   "without": 35188
+  },
+  "NL": {
+   "name": "Nuevo León",
+   "with": 248287,
+   "without": 69181
+  },
+  "OAX": {
+   "name": "Oaxaca",
+   "with": 62797,
+   "without": 285698
+  },
+  "PUE": {
+   "name": "Puebla",
+   "with": 148397,
+   "without": 223147
+  },
+  "QRO": {
+   "name": "Querétaro",
+   "with": 70482,
+   "without": 38417
+  },
+  "QROO": {
+   "name": "Quintana Roo",
+   "with": 57932,
+   "without": 39283
+  },
+  "SLP": {
+   "name": "San Luis Potosí",
+   "with": 83860,
+   "without": 76456
+  },
+  "SIN": {
+   "name": "Sinaloa",
+   "with": 100028,
+   "without": 82529
+  },
+  "SON": {
+   "name": "Sonora",
+   "with": 115334,
+   "without": 153177
+  },
+  "TAB": {
+   "name": "Tabasco",
+   "with": 41208,
+   "without": 37321
+  },
+  "TAMPS": {
+   "name": "Tamaulipas",
+   "with": 160775,
+   "without": 107131
+  },
+  "TLAX": {
+   "name": "Tlaxcala",
+   "with": 40646,
+   "without": 67023
+  },
+  "VER": {
+   "name": "Veracruz",
+   "with": 215303,
+   "without": 203178
+  },
+  "YUC": {
+   "name": "Yucatán",
+   "with": 90732,
+   "without": 73313
+  },
+  "ZAC": {
+   "name": "Zacatecas",
+   "with": 67535,
+   "without": 60246
+  }
+ }
+}

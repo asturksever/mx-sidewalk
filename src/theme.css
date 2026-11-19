@@ -1,0 +1,140 @@
+/* The landing page: the US and Canada sites' layout, in the map's Día de Muertos night for the hero, nav and
+   closing band, and warm paper for the rows. The --navy names are kept from the US stylesheet so the sites stay
+   easy to diff; here they hold the dark violet of the map. */
+:root {
+  --navy: #0d0a1a; /* the map's ground */
+  --navy-2: #1a1233;
+  --navy-3: #261b47;
+  --rule: #33275a;
+  --paper: #fffaf3; /* papel: warm white */
+  --paper-2: #f7efe3;
+  --ink: #1d1530;
+  --ink-2: #554a66;
+  --hairline: #eadfcf;
+  --text: #f5e9d6; /* the map's label colour, for text on the night surfaces */
+  --text-2: #cfc2e0;
+  --muted: #9a8cb6;
+  /* The map's line colours (src/basemap-style.js), deepened just enough to read on paper. The hero, on the
+     map's own dark ground, uses them as the map draws them (see landing.css). */
+  --both: #0e9e92; /* turquesa: INEGI and OpenStreetMap */
+  --inegi: #d98a00; /* cempasúchil: INEGI only */
+  --osm: #7a4fd9; /* violeta: drawn in OpenStreetMap only */
+  --tagged: #9c8256; /* papel: from OpenStreetMap road tags, dashed */
+  --gap: #e0157a; /* rosa mexicano: no sidewalk */
+  --unified: #1d1530;
+  /* Surfaces and text. Light by default; a dark section redefines these for itself. */
+  --surface: var(--paper);
+  --surface-2: var(--paper-2);
+  --line: var(--hairline);
+  --fg: var(--ink);
+  --fg-2: var(--ink-2);
+  --fg-3: #7d7090;
+  --accent: #e0157a; /* rosa mexicano: primary actions */
+  --accent-2: #b80f63;
+  --focus: #7a4fd9;
+  --display: 'Source Sans 3', 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --script: 'Amatic SC', var(--display);
+  --body: var(--display);
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--fg);
+  font-family: var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* The mark: three lines in the map's colours beside the name, set in the map's own lettering. */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex: none;
+  font: 700 27px/1 var(--script);
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  color: inherit;
+  white-space: nowrap;
+}
+
+.brand svg {
+  width: 28px;
+  height: 28px;
+  flex: none;
+}
+
+.brand small {
+  font: 700 11px/1 var(--display);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding-left: 12px;
+  margin-left: 2px;
+  position: relative;
+}
+
+/* A short pink rule between the name and the country, echoing the pink line in the mark. */
+.brand small::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -3.5px;
+  width: 2px;
+  height: 18px;
+  border-radius: 1px;
+  background: #ff2e92;
+}
+
+/* Pill buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 100px;
+  background: var(--accent);
+  color: #fff;
+  font: 600 16px var(--body);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s var(--ease),
+    transform 0.15s var(--ease);
+}
+
+.btn:hover {
+  background: var(--accent-2);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn.ghost {
+  background: none;
+  box-shadow: inset 0 0 0 2px currentColor;
+  color: inherit;
+}
+
+.btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+}

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Map — Sidewalks of Mexico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <!-- Top scrim so header text stays readable over map labels -->
+    <div id="top-scrim" aria-hidden="true"></div>
+
+    <!-- Papel picado banner -->
+    <header id="banner">
+      <svg id="picado" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <pattern id="pennants" x="0" y="0" width="300" height="46" patternUnits="userSpaceOnUse">
+            <!-- five pennants per repeat, scalloped bottoms, cut-out motifs -->
+            <g>
+              <path d="M0 0 H60 V30 Q52 30 50 38 Q45 26 37.5 34 Q30 24 22.5 34 Q15 26 10 38 Q8 30 0 30 Z" fill="#FF2E92"/>
+              <circle cx="30" cy="14" r="5" fill="#0d0a1a"/>
+              <path d="M20 22 l5 -5 5 5 -5 5 Z" fill="#0d0a1a"/>
+              <path d="M30 22 l5 -5 5 5 -5 5 Z" fill="#0d0a1a"/>
+            </g>
+            <g transform="translate(60,0)">
+              <path d="M0 0 H60 V30 Q52 30 50 38 Q45 26 37.5 34 Q30 24 22.5 34 Q15 26 10 38 Q8 30 0 30 Z" fill="#FFA800"/>
+              <path d="M30 6 l7 8 -7 8 -7 -8 Z" fill="#0d0a1a"/>
+              <circle cx="15" cy="18" r="3.5" fill="#0d0a1a"/>
+              <circle cx="45" cy="18" r="3.5" fill="#0d0a1a"/>
+            </g>
+            <g transform="translate(120,0)">
+              <path d="M0 0 H60 V30 Q52 30 50 38 Q45 26 37.5 34 Q30 24 22.5 34 Q15 26 10 38 Q8 30 0 30 Z" fill="#2EE6D6"/>
+              <circle cx="30" cy="15" r="7" fill="#0d0a1a"/>
+              <circle cx="30" cy="15" r="3" fill="#2EE6D6"/>
+            </g>
+            <g transform="translate(180,0)">
+              <path d="M0 0 H60 V30 Q52 30 50 38 Q45 26 37.5 34 Q30 24 22.5 34 Q15 26 10 38 Q8 30 0 30 Z" fill="#9B5DE5"/>
+              <path d="M18 20 l6 -10 6 10 Z" fill="#0d0a1a"/>
+              <path d="M30 20 l6 -10 6 10 Z" fill="#0d0a1a"/>
+            </g>
+            <g transform="translate(240,0)">
+              <path d="M0 0 H60 V30 Q52 30 50 38 Q45 26 37.5 34 Q30 24 22.5 34 Q15 26 10 38 Q8 30 0 30 Z" fill="#F15BB5"/>
+              <circle cx="20" cy="12" r="4" fill="#0d0a1a"/>
+              <circle cx="40" cy="12" r="4" fill="#0d0a1a"/>
+              <path d="M22 22 q8 8 16 0" stroke="#0d0a1a" stroke-width="3" fill="none"/>
+            </g>
+          </pattern>
+        </defs>
+        <rect width="100%" height="46" fill="url(#pennants)"/>
+      </svg>
+      <h1>Sidewalks of Mexico</h1>
+    </header>
+
+    <!-- Legend -->
+    <aside id="legend" aria-label="Sidewalk filters">
+      <h2>Sidewalks</h2>
+      <label class="toggle row">
+        <input type="checkbox" id="filter-both" checked />
+        <span class="swatch" style="--c:#2EE6D6"></span> INEGI and OpenStreetMap
+      </label>
+      <label class="toggle row">
+        <input type="checkbox" id="filter-inegi" checked />
+        <span class="swatch" style="--c:#FFA800"></span> INEGI census only
+      </label>
+      <label class="toggle row">
+        <input type="checkbox" id="filter-osm" checked />
+        <span class="swatch" style="--c:#B98CFF"></span> Drawn in OpenStreetMap
+      </label>
+      <label class="toggle row">
+        <input type="checkbox" id="filter-tagged" checked />
+        <span class="swatch dashed" style="--c:#F5E9D6"></span> From OSM road tags
+      </label>
+      <label class="toggle row">
+        <input type="checkbox" id="filter-gaps" checked />
+        <span class="swatch" style="--c:#FF2E92"></span> No sidewalk (INEGI)
+      </label>
+      <p class="credit">Data: INEGI Inventario Nacional de Viviendas 2020 · © OpenStreetMap contributors</p>
+    </aside>
+
+    <!-- Layer toggles -->
+    <aside id="layers" aria-label="Map layers">
+      <h2>Layers</h2>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-buildings" checked />
+        <span>3D buildings</span>
+      </label>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-satellite" />
+        <span>Satellite imagery</span>
+      </label>
+    </aside>
+
+    <!-- Fly-to chips (animated marquee) -->
+    <nav id="places" aria-label="Fly to a city">
+      <button id="marquee-toggle" aria-pressed="false" aria-label="Pause city ticker">⏸</button>
+      <div class="marquee">
+        <div class="marquee-track">
+          <div class="marquee-set" data-set="main"></div>
+          <div class="marquee-set" data-set="clone" aria-hidden="true"></div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hover info card -->
+    <div id="info" hidden>
+      <div id="info-street"></div>
+      <div id="info-status"></div>
+      <div id="info-loc"></div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
