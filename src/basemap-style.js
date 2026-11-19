@@ -21,6 +21,7 @@ const COLORS = {
   osm: '#B98CFF', // violeta — drawn in OSM, not in INEGI
   tagged: '#F5E9D6', // papel — offset from OSM road tags (sidewalk=both/left/right)
   gap: '#FF2E92', // rosa mexicano — INEGI: this block side has no sidewalk
+  unified: '#F2EEFF', // the unified network: every source in one colour
 };
 
 // Drawn ways and the stubs that join them share a colour; connectors are short.
@@ -195,6 +196,29 @@ export function buildStyle(pmtilesUrl) {
           'line-color': COLORS.gap,
           'line-width': coreWidth,
           'line-opacity': ['interpolate', ['linear'], ['zoom'], 4, 0.75, 11, 0.9],
+        },
+      },
+      // --- the unified network: every sidewalk from every source in one colour, on by default. The source
+      // layers below draw over it in their own colours when their legend rows are ticked. ---
+      {
+        id: 'unified-glow',
+        type: 'line',
+        source: 'sidewalks',
+        'source-layer': 'sidewalks',
+        minzoom: 11,
+        layout: { 'line-cap': 'round' },
+        paint: { 'line-color': COLORS.unified, 'line-width': glowWidth, 'line-blur': glowBlur, 'line-opacity': 0.25 },
+      },
+      {
+        id: 'unified',
+        type: 'line',
+        source: 'sidewalks',
+        'source-layer': 'sidewalks',
+        layout: { 'line-cap': 'round' },
+        paint: {
+          'line-color': COLORS.unified,
+          'line-width': coreWidth,
+          'line-opacity': ['interpolate', ['linear'], ['zoom'], 4, 0.85, 11, 1],
         },
       },
       {
