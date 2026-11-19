@@ -62,20 +62,24 @@
     <!-- Legend -->
     <aside id="legend" aria-label="Sidewalk filters">
       <h2>Sidewalks</h2>
+      <label class="toggle row" id="unified-row">
+        <input type="checkbox" id="toggle-unified" checked />
+        <span class="swatch" style="--c:#F2EEFF"></span> Unified network
+      </label>
       <label class="toggle row">
-        <input type="checkbox" id="filter-both" checked />
+        <input type="checkbox" id="filter-both" />
         <span class="swatch" style="--c:#2EE6D6"></span> INEGI and OpenStreetMap
       </label>
       <label class="toggle row">
-        <input type="checkbox" id="filter-inegi" checked />
+        <input type="checkbox" id="filter-inegi" />
         <span class="swatch" style="--c:#FFA800"></span> INEGI census only
       </label>
       <label class="toggle row">
-        <input type="checkbox" id="filter-osm" checked />
+        <input type="checkbox" id="filter-osm" />
         <span class="swatch" style="--c:#B98CFF"></span> Drawn in OpenStreetMap
       </label>
       <label class="toggle row">
-        <input type="checkbox" id="filter-tagged" checked />
+        <input type="checkbox" id="filter-tagged" />
         <span class="swatch dashed" style="--c:#F5E9D6"></span> From OSM road tags
       </label>
       <label class="toggle row">

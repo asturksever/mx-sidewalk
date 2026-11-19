@@ -21,6 +21,7 @@ const COLORS = {
   osm: '#B98CFF', // violeta — drawn in OSM, not in INEGI
   tagged: '#F5E9D6', // papel — offset from OSM road tags (sidewalk=both/left/right)
   gap: '#FF2E92', // rosa mexicano — INEGI: this block side has no sidewalk
+  unified: '#F2EEFF', // the unified network: every source in one colour
 };
 
 // Drawn ways and the stubs that join them share a colour; connectors are short.
@@ -37,7 +38,8 @@ const sidewalkColor = [
 
 const isSolid = ['match', ['get', 'provenance'], SOLID, true, false];
 
-const coreWidth = ['interpolate', ['linear'], ['zoom'], 4, 0.8, 8, 1, 11, 1, 14, 1.8, 17, 3.2];
+// Wider when zoomed out: at country scale a 1 px line all but disappears on the dark ground.
+const coreWidth = ['interpolate', ['linear'], ['zoom'], 4, 1.6, 8, 1.4, 11, 1.2, 14, 1.8, 17, 3.2];
 const glowWidth = ['interpolate', ['linear'], ['zoom'], 11, 3, 14, 7, 17, 14];
 const glowBlur = ['interpolate', ['linear'], ['zoom'], 11, 3, 17, 8];
 
@@ -186,11 +188,37 @@ export function buildStyle(pmtilesUrl) {
         type: 'line',
         source: 'sidewalks',
         'source-layer': 'gaps',
+        // Not at country scale: the low-zoom tiles keep about twice as many gap lines as sidewalks, and the pink
+        // buried the unified network. From zoom 9 they outline each city's fringe.
+        minzoom: 9,
         layout: { 'line-cap': 'round' },
         paint: {
           'line-color': COLORS.gap,
           'line-width': coreWidth,
           'line-opacity': ['interpolate', ['linear'], ['zoom'], 4, 0.75, 11, 0.9],
+        },
+      },
+      // --- the unified network: every sidewalk from every source in one colour, on by default. The source
+      // layers below draw over it in their own colours when their legend rows are ticked. ---
+      {
+        id: 'unified-glow',
+        type: 'line',
+        source: 'sidewalks',
+        'source-layer': 'sidewalks',
+        minzoom: 11,
+        layout: { 'line-cap': 'round' },
+        paint: { 'line-color': COLORS.unified, 'line-width': glowWidth, 'line-blur': glowBlur, 'line-opacity': 0.25 },
+      },
+      {
+        id: 'unified',
+        type: 'line',
+        source: 'sidewalks',
+        'source-layer': 'sidewalks',
+        layout: { 'line-cap': 'round' },
+        paint: {
+          'line-color': COLORS.unified,
+          'line-width': coreWidth,
+          'line-opacity': ['interpolate', ['linear'], ['zoom'], 4, 0.85, 11, 1],
         },
       },
       {

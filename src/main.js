@@ -1,7 +1,7 @@
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { Protocol } from 'pmtiles';
-import { buildStyle } from './basemap-style.js';
+import { buildStyle, COLORS } from './basemap-style.js';
 
 const protocol = new Protocol();
 maplibregl.addProtocol('pmtiles', protocol.tile);
@@ -109,13 +109,15 @@ if (prefersReducedMotion) {
 }
 
 // --- Source filters (legend checkboxes) ---
-// Each checkbox turns on a set of `provenance` values in the sidewalks layer;
-// "No sidewalk" is the separate gaps layer.
+// The top row is the unified network: every sidewalk, from every source, in one colour (on by default, as on
+// the US map). Each source row draws its `provenance` values over it in their own colour; "No sidewalk" is the
+// separate gaps layer.
 const SOURCE_FILTERS = [
   { input: 'filter-both', values: ['both'] },
   { input: 'filter-inegi', values: ['inegi_only'] },
   { input: 'filter-osm', values: ['osm_only', 'connector'] },
 ];
+const unifiedToggle = document.getElementById('toggle-unified');
 const filterTagged = document.getElementById('filter-tagged');
 const filterGaps = document.getElementById('filter-gaps');
 
@@ -126,6 +128,7 @@ function applySidewalkFilter() {
   map.setFilter('sidewalk-core', filter);
   map.setFilter('sidewalk-glow', filter);
   map.setLayoutProperty('sidewalk-tagged', 'visibility', filterTagged.checked ? 'visible' : 'none');
+  for (const id of ['unified', 'unified-glow']) map.setLayoutProperty(id, 'visibility', unifiedToggle.checked ? 'visible' : 'none');
   for (const id of ['gap-core', 'gap-glow']) map.setLayoutProperty(id, 'visibility', filterGaps.checked ? 'visible' : 'none');
 }
 
@@ -180,7 +183,7 @@ const info = document.getElementById('info');
 const infoStreet = document.getElementById('info-street');
 const infoStatus = document.getElementById('info-status');
 const infoLoc = document.getElementById('info-loc');
-const HOVER_LAYERS = ['sidewalk-core', 'sidewalk-tagged', 'gap-core'];
+const HOVER_LAYERS = ['sidewalk-core', 'sidewalk-tagged', 'unified', 'gap-core'];
 
 map.on('mousemove', (e) => {
   const features = map.queryRenderedFeatures(
@@ -198,9 +201,11 @@ map.on('mousemove', (e) => {
   // queryRenderedFeatures lists the topmost layer first, so sidewalks beat gaps.
   const feat = features[0];
   const f = feat.properties;
-  const status = feat.sourceLayer === 'gaps'
-    ? GAP_LABEL
-    : SOURCE_LABEL[f.provenance] ?? { text: 'Sidewalk', color: '#B98CFF' };
+  const source = SOURCE_LABEL[f.provenance] ?? { text: 'Sidewalk', color: '#B98CFF' };
+  let status = source;
+  if (feat.sourceLayer === 'gaps') status = GAP_LABEL;
+  // A line seen only through the unified layer still says where it comes from.
+  else if (feat.layer.id === 'unified') status = { text: `Unified network · ${source.text.replace(/^Sidewalk( link)? — /, '')}`, color: COLORS.unified };
   infoStreet.textContent = f.street || 'Unnamed street';
   infoStatus.textContent = status.text;
   infoStatus.style.color = status.color;

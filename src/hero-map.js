@@ -18,7 +18,7 @@ const open = document.getElementById('hero-open');
 // Centro Histórico, Mexico City: every kind of line and the gaps show at once.
 const START = [[-99.1505, 19.4255], [-99.1225, 19.4405]];
 const style = buildStyle(PMTILES_URL);
-style.layers = style.layers.filter((l) => !['building-3d', 'satellite', 'place-suburb'].includes(l.id));
+style.layers = style.layers.filter((l) => !['building-3d', 'satellite', 'place-suburb', 'unified', 'unified-glow'].includes(l.id));
 delete style.sky;
 
 const map = new maplibregl.Map({
