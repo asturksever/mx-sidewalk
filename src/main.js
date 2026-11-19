@@ -6,7 +6,13 @@ import { buildStyle } from './basemap-style.js';
 const protocol = new Protocol();
 maplibregl.addProtocol('pmtiles', protocol.tile);
 
-const pmtilesUrl = `${location.origin}/data/mexico_sidewalks.pmtiles`;
+// The archive lives in R2. On www.opensidewalks.org/mx the Worker serves it under
+// /mx/data/ (see worker.js); the build names the exact version with
+// VITE_PMTILES_URL. Locally, drop a copy in public/data/.
+const pmtilesUrl = new URL(
+  import.meta.env.VITE_PMTILES_URL || `${import.meta.env.BASE_URL}data/mexico_sidewalks.pmtiles`,
+  location.href,
+).href;
 
 const map = new maplibregl.Map({
   container: 'map',
@@ -102,25 +108,28 @@ if (prefersReducedMotion) {
   track.style.setProperty('--marquee-duration', `${PLACES.length * 3.5}s`);
 }
 
-// --- Sidewalk class filters (legend checkboxes) ---
-const filterYes = document.getElementById('filter-yes');
-const filterNo = document.getElementById('filter-no');
-const filterOther = document.getElementById('filter-other');
+// --- Source filters (legend checkboxes) ---
+// Each checkbox turns on a set of `provenance` values in the sidewalks layer;
+// "No sidewalk" is the separate gaps layer.
+const SOURCE_FILTERS = [
+  { input: 'filter-both', values: ['both'] },
+  { input: 'filter-inegi', values: ['inegi_only'] },
+  { input: 'filter-osm', values: ['osm_only', 'connector'] },
+];
+const filterTagged = document.getElementById('filter-tagged');
+const filterGaps = document.getElementById('filter-gaps');
 
 function applySidewalkFilter() {
   if (!map.getLayer('sidewalk-core')) return;
-  const enabled = [];
-  if (filterYes.checked) enabled.push('Dispone');
-  if (filterNo.checked) enabled.push('No dispone');
-  const filter = enabled.length
-    ? ['match', ['get', 'BANQUETA_D'], enabled, true, false]
-    : ['==', ['get', 'BANQUETA_D'], '__none__'];
+  const enabled = SOURCE_FILTERS.filter((f) => document.getElementById(f.input).checked).flatMap((f) => f.values);
+  const filter = ['match', ['get', 'provenance'], enabled.length ? enabled : ['__none__'], true, false];
   map.setFilter('sidewalk-core', filter);
   map.setFilter('sidewalk-glow', filter);
-  map.setLayoutProperty('sidewalk-other', 'visibility', filterOther.checked ? 'visible' : 'none');
+  map.setLayoutProperty('sidewalk-tagged', 'visibility', filterTagged.checked ? 'visible' : 'none');
+  for (const id of ['gap-core', 'gap-glow']) map.setLayoutProperty(id, 'visibility', filterGaps.checked ? 'visible' : 'none');
 }
 
-for (const el of [filterYes, filterNo, filterOther]) el.addEventListener('change', applySidewalkFilter);
+for (const el of document.querySelectorAll('#legend input')) el.addEventListener('change', applySidewalkFilter);
 map.on('load', applySidewalkFilter);
 
 const marqueeToggle = document.getElementById('marquee-toggle');
@@ -147,19 +156,31 @@ for (const { input, layer } of LAYER_TOGGLES) {
 }
 
 // --- Hover info card ---
-const STATUS_LABEL = {
-  Dispone: { text: 'Has sidewalk', color: '#FFA800' },
-  'No dispone': { text: 'No sidewalk', color: '#FF2E92' },
-  'No aplica': { text: 'Not applicable', color: '#5a4d80' },
-  'Conjunto habitacional': { text: 'Gated housing complex', color: '#5a4d80' },
-  'No especificado': { text: 'Unspecified', color: '#5a4d80' },
+const SOURCE_LABEL = {
+  both: { text: 'Sidewalk — INEGI and OpenStreetMap', color: '#2EE6D6' },
+  inegi_only: { text: 'Sidewalk — INEGI census', color: '#FFA800' },
+  osm_only: { text: 'Sidewalk — drawn in OpenStreetMap', color: '#B98CFF' },
+  connector: { text: 'Sidewalk link — joins OSM sidewalks', color: '#B98CFF' },
+  synth_tagged: { text: 'Sidewalk — from OSM road tags', color: '#F5E9D6' },
 };
+const GAP_LABEL = { text: 'No sidewalk — INEGI census', color: '#FF2E92' };
+
+const STATE_NAME = {
+  AGS: 'Aguascalientes', BC: 'Baja California', BCS: 'Baja California Sur', CAMP: 'Campeche',
+  COAH: 'Coahuila', COL: 'Colima', CHIS: 'Chiapas', CHIH: 'Chihuahua', CDMX: 'Ciudad de México',
+  DGO: 'Durango', GTO: 'Guanajuato', GRO: 'Guerrero', HGO: 'Hidalgo', JAL: 'Jalisco',
+  MEX: 'Estado de México', MICH: 'Michoacán', MOR: 'Morelos', NAY: 'Nayarit', NL: 'Nuevo León',
+  OAX: 'Oaxaca', PUE: 'Puebla', QRO: 'Querétaro', QROO: 'Quintana Roo', SLP: 'San Luis Potosí',
+  SIN: 'Sinaloa', SON: 'Sonora', TAB: 'Tabasco', TAMPS: 'Tamaulipas', TLAX: 'Tlaxcala',
+  VER: 'Veracruz', YUC: 'Yucatán', ZAC: 'Zacatecas',
+};
+const RAMPS = { yes: 'kerb ramps', no: 'no kerb ramps' };
 
 const info = document.getElementById('info');
 const infoStreet = document.getElementById('info-street');
 const infoStatus = document.getElementById('info-status');
 const infoLoc = document.getElementById('info-loc');
-const SIDEWALK_LAYERS = ['sidewalk-core', 'sidewalk-other'];
+const HOVER_LAYERS = ['sidewalk-core', 'sidewalk-tagged', 'gap-core'];
 
 map.on('mousemove', (e) => {
   const features = map.queryRenderedFeatures(
@@ -167,20 +188,23 @@ map.on('mousemove', (e) => {
       [e.point.x - 4, e.point.y - 4],
       [e.point.x + 4, e.point.y + 4],
     ],
-    { layers: SIDEWALK_LAYERS.filter((l) => map.getLayer(l)) },
+    { layers: HOVER_LAYERS.filter((l) => map.getLayer(l)) },
   );
   if (!features.length) {
     info.hidden = true;
     map.getCanvas().style.cursor = '';
     return;
   }
-  const f = features[0].properties;
-  const status = STATUS_LABEL[f.BANQUETA_D] ?? { text: f.BANQUETA_D ?? '—', color: '#5a4d80' };
-  const street = [f.TIPOVIAL, f.NOMVIAL].filter((s) => s && s !== 'None').join(' ');
-  infoStreet.textContent = street || 'Unnamed street';
+  // queryRenderedFeatures lists the topmost layer first, so sidewalks beat gaps.
+  const feat = features[0];
+  const f = feat.properties;
+  const status = feat.sourceLayer === 'gaps'
+    ? GAP_LABEL
+    : SOURCE_LABEL[f.provenance] ?? { text: 'Sidewalk', color: '#B98CFF' };
+  infoStreet.textContent = f.street || 'Unnamed street';
   infoStatus.textContent = status.text;
   infoStatus.style.color = status.color;
-  infoLoc.textContent = f._state_name ?? '';
+  infoLoc.textContent = [STATE_NAME[f.prov], RAMPS[f.ramps], f.osm_id].filter(Boolean).join(' · ');
   info.hidden = false;
   info.style.left = `${e.point.x + 14}px`;
   info.style.top = `${e.point.y + 14}px`;
