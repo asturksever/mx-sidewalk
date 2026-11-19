@@ -37,7 +37,8 @@ const sidewalkColor = [
 
 const isSolid = ['match', ['get', 'provenance'], SOLID, true, false];
 
-const coreWidth = ['interpolate', ['linear'], ['zoom'], 4, 0.8, 8, 1, 11, 1, 14, 1.8, 17, 3.2];
+// Wider when zoomed out: at country scale a 1 px line all but disappears on the dark ground.
+const coreWidth = ['interpolate', ['linear'], ['zoom'], 4, 1.6, 8, 1.4, 11, 1.2, 14, 1.8, 17, 3.2];
 const glowWidth = ['interpolate', ['linear'], ['zoom'], 11, 3, 14, 7, 17, 14];
 const glowBlur = ['interpolate', ['linear'], ['zoom'], 11, 3, 17, 8];
 
@@ -186,6 +187,9 @@ export function buildStyle(pmtilesUrl) {
         type: 'line',
         source: 'sidewalks',
         'source-layer': 'gaps',
+        // Not at country scale: the low-zoom tiles keep about twice as many gap lines as sidewalks, and the pink
+        // buried the unified network. From zoom 9 they outline each city's fringe.
+        minzoom: 9,
         layout: { 'line-cap': 'round' },
         paint: {
           'line-color': COLORS.gap,
