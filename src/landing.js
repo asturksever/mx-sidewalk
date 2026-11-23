@@ -1,5 +1,8 @@
 import STATS from './stats.json';
 import './contact.js';
+import { initUpdates } from './updates.js';
+
+initUpdates();
 
 // Before this page existed the site was the map itself, so old links carry a map position in the hash
 // (#zoom/lat/lng): send them on to the map.

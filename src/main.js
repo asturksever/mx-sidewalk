@@ -2,9 +2,12 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { Protocol } from 'pmtiles';
 import { buildStyle, COLORS } from './basemap-style.js';
+import { initUpdates } from './updates.js';
 
 const protocol = new Protocol();
 maplibregl.addProtocol('pmtiles', protocol.tile);
+
+initUpdates({ map: true });
 
 // The archive lives in R2. On www.opensidewalks.org/mx the Worker serves it under
 // /mx/data/ (see worker.js); the build names the exact version with
